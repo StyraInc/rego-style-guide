@@ -1,5 +1,20 @@
 # Rego Style Guide
 
+Given the general purpose nature of Open Policy Agent (OPA) — and the versatility of the Rego language — there is
+often more than one way to express a policy or rule. Even when setting pure _formatting_ concerns, like "how many
+spaces should be used for indentation?" or "should an array comprehension span multiple lines?" aside, coding style
+(and opionons around the topic) tends to encompass much more than that.
+
+The aim of this style guide is to provide a collection of _recommendations_ and good practices around Rego policy
+authoring, compiled by people having **extensive** experience working with OPA and Rego — in their role as maintainers,
+vendors or end-users. While many of the recommendations here have been provided by people involved in the OPA project,
+this guide does **not** constitute an "official" style guide for Rego. Similar to how OPA provides decisions, but does
+not itself **enforce** them, this guide should not be considered law.
+
+When deciding on style within a larger group of developers, finding acceptance (if not consensus) on a set of principles
+is often more important than the principles themselves. Feel free to use the rules provided here as you wish: adopt all
+of them, choose only those you find sensible, or ignore them all!
+
 ## General advice
 
 ### Optimize for readability and obviousness, not performance
@@ -142,6 +157,7 @@ allow {
 **Prefer**
 ```rego
 allow {
+    # Alternatively, delegate OR condition to helper rule
     startswith_any(input.request.path, {"/public", "/static"})
 }
 
@@ -296,6 +312,8 @@ violations[message] {
 ```
 
 ## Best Practices
+
+Some practices commonly considered best for Rego development.
 
 ### Use `opa fmt`
 
