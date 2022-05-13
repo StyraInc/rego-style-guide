@@ -88,6 +88,56 @@ is_developer {
 }
 ```
 
+Additionally, helper rules and functions may be kept in (and imported from) separate modules, allowing you to build a
+logical — and reusable! — structure for your policy files.
+
+## Data types
+
+### Prefer sets over arrays (where applicable)
+
+For any *unordered* sequence of *unique* values, prefer to use
+[sets](https://www.openpolicyagent.org/docs/latest/policy-reference/#sets) over
+[arrays](https://www.openpolicyagent.org/docs/latest/policy-reference/#arrays).
+
+This is almost always the case for common policy data like **roles** and **permissions**.
+For any applicable sequence of values, sets have the following benefits over arrays:
+
+* Clearly communicate uniqueness and non-ordered characteristics
+* Performance: set lookups are O(1) while array lookups are O(n)
+* Powerful [set operations](https://www.openpolicyagent.org/docs/latest/policy-reference/#sets-2) available
+
+**Avoid**
+```rego
+required_roles := ["accountant", "reports-writer"]
+provided_roles := [role | some role in input.user.roles]
+
+allow {
+    every required_role in required_roles {
+        required_role in provided_roles
+    }
+}
+```
+
+**Prefer**
+```rego
+required_roles := {"accountant", "reports-writer"}
+provided_roles := {role | some role in input.user.roles}
+
+allow {
+    every required_role in required_roles {
+        required_role in provided_roles
+    }
+}
+
+# Alternatively, use set intersection
+
+allow {
+    required_roles & provided_roles == required_roles
+}
+```
+
+Related reading: [Five things you didn't know about OPA](https://blog.styra.com/blog/five-things-you-didnt-know-about-opa).
+
 ## Regex
 
 ### Use raw strings for regex patterns
