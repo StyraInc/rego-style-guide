@@ -6,7 +6,7 @@
 
 Rego is a declarative language, which in the best of worlds means you express **what** you want rather than **how** it
 should be retrieved. When authoring policy, do not try to be "smart" about assumed performance characteristics or
-optimizations. That's what OPA should do!
+optimizations. That's what OPA should worry about!
 
 Optimize for **readbility** and **obviousness**. Optimize for performance *only* if you've identified performance
 issues in your policy, and even if you do — making your policy more compact or "clever" almost never helps addressing
@@ -35,6 +35,7 @@ user_is_admin {
 ```
 
 **Notes / Exceptions**
+
 For many policy types, you might not control the format of the `input` data — if the domain of a policy (e.g. Envoy)
 mandates a different style, making an exception might seem reasonable. Adapting policy format after `input` is however
 prone to inconsistencies, as you'll likely end up mixing different styles in the same policy (due to imports of common
