@@ -9,14 +9,14 @@ The built-in functions use `snake_case` for naming — follow that convention fo
 **Avoid**
 ```rego
 userIsAdmin {
-	"admin" in input.user.roles
+    "admin" in input.user.roles
 }
 ```
 
 **Prefer**
 ```rego
 user_is_admin {
-	"admin" in input.user.roles
+    "admin" in input.user.roles
 }
 ```
 
@@ -98,18 +98,27 @@ you to avoid having to escape special characters like `\` in your regex patterns
 **Avoid**
 ```rego
 allow {
-	regex.match(`[\d]+`, "12345")
+    regex.match(`[\d]+`, "12345")
 }
 ```
 
 **Prefer**
 ```rego
 allow {
-	regex.match("[\\d]+", "12345")
+    regex.match("[\\d]+", "12345")
 }
 ```
 
 ## Best Practices
+
+### Use `opa fmt`
+
+The `opa fmt` tool ensures consistent formatting across teams and projects. While certainly not
+[perfect](https://github.com/open-policy-agent/opa/issues/4508) (yet!), unified formatting is a big win, and saves a
+lot of time in code reviews arguing over style.
+
+A good idea could be to run `opa fmt --write` on save, which can be configured in most editors. If you want to enforce
+`opa fmt` formatting as part of your build pipeline, use `opa fmt --fail`.
 
 ### Use strict mode
 
