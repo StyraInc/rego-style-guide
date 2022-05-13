@@ -147,15 +147,40 @@ you to avoid having to escape special characters like `\` in your regex patterns
 
 **Avoid**
 ```rego
-allow {
+all_digits {
     regex.match(`[\d]+`, "12345")
 }
 ```
 
 **Prefer**
 ```rego
-allow {
+all_digits {
     regex.match("[\\d]+", "12345")
+}
+```
+
+## Imports
+
+### Prefer importing modules over rules and functions
+
+Importing modules rather than specific rules and functions allows you to reference them by the module name, making it
+obvious where the rule or function was declared. Additionally, well named packages help provide context to assertions.
+
+**Avoid**
+```rego
+import data.user.is_admin
+
+allow {
+    is_admin
+}
+```
+
+**Prefer**
+```rego
+import data.user
+
+allow {
+    user.is_admin
 }
 ```
 
