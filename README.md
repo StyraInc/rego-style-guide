@@ -15,9 +15,31 @@ When deciding on style within a larger group of developers, finding acceptance (
 is often more important than the principles themselves. Feel free to use the rules provided here as you wish: adopt all
 of them, choose only those you find sensible, or ignore them all!
 
-## General advice
+## Contents
 
-### Optimize for readability and obviousness, not performance
+- [General Advice](#general-advice)
+  - [Optimize for readability, not performance](#optimize-for-readability-not-performance)
+- [Style](#style)
+  - [Prefer snake_case for rule names and variables](#prefer-snakecase-for-rule-names-and-variables)
+  - [Keep line length <= 120 characters](#keep-line-length--120-characters)
+- [Rules](#rules)
+  - [Use established naming conventions](#use-established-naming-conventions)
+  - [Use helper rules](#use-helper-rules)
+  - [Prefer repeated named rules over repeating rule bodies](#prefer-repeated-named-rules-over-repeating-rule-bodies)
+- [Data Types](#data-types)
+  - [Prefer sets over arrays (where applicable)](#prefer-sets-over-arrays-where-applicable)
+- [Regex](#regex)
+  - [Use raw strings for regex patterns](#use-raw-strings-for-regex-patterns)
+- [Imports](#imports)
+  - [Prefer importing modules over rules and functions](#prefer-importing-modules-over-rules-and-functions)
+  - [Avoid importing `input`](#avoid-importing-input)
+- [Best Practices](#best-practices)
+  - [Use `opa fmt`](#use-opa-fmt)
+  - [Use strict mode](#use-strict-mode)
+
+## General Advice
+
+### Optimize for readability, not performance
 
 Rego is a declarative language, which in the best of worlds means you express **what** you want rather than **how** it
 should be retrieved. When authoring policy, do not try to be "smart" about assumed performance characteristics or
@@ -167,7 +189,7 @@ startswith_any(str, prefixes) {
 }
 ```
 
-## Data types
+## Data Types
 
 ### Prefer sets over arrays (where applicable)
 
