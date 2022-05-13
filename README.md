@@ -148,14 +148,14 @@ you to avoid having to escape special characters like `\` in your regex patterns
 **Avoid**
 ```rego
 all_digits {
-    regex.match(`[\d]+`, "12345")
+    regex.match("[\\d]+", "12345")
 }
 ```
 
 **Prefer**
 ```rego
 all_digits {
-    regex.match("[\\d]+", "12345")
+    regex.match(`[\d]+`, "12345")
 }
 ```
 
