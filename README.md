@@ -1,24 +1,23 @@
 # Rego Style Guide
 
 Given the general purpose nature of Open Policy Agent (OPA) — and the versatility of the Rego language — there is
-often more than one way to express a policy or rule. Even when setting pure _formatting_ concerns, like "how many
-spaces should be used for indentation?" or "should an array comprehension span multiple lines?" aside, coding style
-(and opionons around the topic) tends to encompass much more than that.
+often more ways than one to express what one wants to accomplish. Even when setting pure _formatting_ concerns, like
+"how many spaces should be used for indentation?" or "should an array comprehension span multiple lines?" aside, coding
+style (and opionons around the topic) tends to encompass much more.
 
-The aim of this style guide is to provide a collection of _recommendations_ and good practices around Rego policy
-authoring, compiled by people having **extensive** experience working with OPA and Rego — in their role as maintainers,
-vendors or end-users. While many of the recommendations here have been provided by people involved in the OPA project,
-this guide does **not** constitute an "official" style guide for Rego. Similar to how OPA provides decisions, but does
-not itself **enforce** them, this guide should not be considered law.
+The purpose of this style guide is to provide a collection of recommendations and best practices for authoring Rego
+policy. As with any style guide - the advice provided here is highly subjective — although based on years of experience
+working with OPA and Rego.
 
 When deciding on style within a larger group of developers, finding acceptance (if not consensus) on a set of principles
-is often more important than the principles themselves. Feel free to use the rules provided here as you wish: adopt all
-of them, choose only those you find sensible, or ignore them all!
+is often more important than the principles themselves. Use the rules provided here as you wish: adopt the guide in its
+entirety, pick what you like, or go your own way.
 
 ## Contents
 
 - [General Advice](#general-advice)
   - [Optimize for readability, not performance](#optimize-for-readability-not-performance)
+  - [Use metadata annotations](#use-metadata-annotations)
 - [Style](#style)
   - [Prefer snake_case for rule names and variables](#prefer-snakecase-for-rule-names-and-variables)
   - [Keep line length <= 120 characters](#keep-line-length--120-characters)
@@ -26,7 +25,9 @@ of them, choose only those you find sensible, or ignore them all!
   - [Use established naming conventions](#use-established-naming-conventions)
   - [Use helper rules](#use-helper-rules)
   - [Prefer repeated named rules over repeating rule bodies](#prefer-repeated-named-rules-over-repeating-rule-bodies)
-- [Data Types](#data-types)
+- [Variables and Data Types](#variables-and-data-types)
+  - [Don't use unification operator for assignment or comparison](#dont-use-unification-operator-for-assignment-or-comparison)
+  - [Don't use undeclared variables](#dont-use-undeclared-variables)
   - [Prefer sets over arrays (where applicable)](#prefer-sets-over-arrays-where-applicable)
 - [Regex](#regex)
   - [Use raw strings for regex patterns](#use-raw-strings-for-regex-patterns)
@@ -49,7 +50,53 @@ Optimize for **readbility** and **obviousness**. Optimize for performance *only*
 issues in your policy, and even if you do — making your policy more compact or "clever" almost never helps addressing
 the problem at hand.
 
-Related reading: [Policy Performance](https://www.openpolicyagent.org/docs/latest/policy-performance/)
+#### Related Resources
+- [Policy Performance](https://www.openpolicyagent.org/docs/latest/policy-performance/)
+
+### Use metadata annotations
+
+Favor [metadata annotations](https://www.openpolicyagent.org/docs/latest/annotations/) over regular comments.
+Metadata annotations allow external tools and editors to parse their contents, potentially leveraging them for
+something useful, like in-line explanations, generated docs, etc.
+
+**Avoid**
+```rego
+# Base package composing the decision from deny rules in sub-packages
+package main
+
+# Aggregate deny rules from package(s) under `authorization` based
+# on first path component in input
+router[msg] {
+    data["authorization"][input.path[0]].deny[msg]
+}
+```
+
+**Prefer**
+```rego
+# METADATA
+# description: Base package composing the decision from deny rules in sub-packages
+package main
+
+# METADATA
+# description: |
+#  Aggregate deny rules from package(s) under `authorization` based
+#  on first path component in input
+router[msg] {
+    data["authorization"][input.path[0]].deny[msg]
+}
+```
+
+**Notes / Exceptions**
+
+Use regular comments inside of rule bodies, or for packages and rules you consider "internal".
+
+#### Related Resources
+- [Annotations](https://www.openpolicyagent.org/docs/latest/annotations/)
+
+### Get to know the built-in functions
+
+With more than 150 built-in functions tailor-made for policy evaluation, there's a good chance that some of them can
+help you accomplish your goal.
 
 ## Style
 
@@ -100,8 +147,10 @@ frontend_admin_users := [username |
 
 ### Use established naming conventions
 
-1. Use `allow` for boolean rules generating the decision
-1. Use `deny` or `violation` for partial rules generating the decision
+Policy that sticks to established naming conventions is easier to understand.
+
+1. Use `allow` for boolean rules generating a decision
+1. Use `deny`, `enforce`, or `violation` for partial rules generating a decision
 
 ### Use helper rules
 
@@ -189,7 +238,106 @@ startswith_any(str, prefixes) {
 }
 ```
 
-## Data Types
+## Variables and Data Types
+
+### Don't use unification operator for assignment or comparison
+
+The [unification](https://www.openpolicyagent.org/docs/latest/policy-language/#unification-) operator (`=`) allows you
+to combine assignment and comparison. While this is useful in a few specific cases (see "Notes / Exceptions" below),
+using the assignment operator (`:=`) for assignment, and the comparison operator (`==`) for comparison, is almost always
+preferable. Separating assignment from comparison clearly demonstrates intent, and removes the ambiguity around scope
+associated with unification.
+
+**Avoid**
+```rego
+# Top level assignment using unification operator
+roles = input.user.roles
+
+allow {
+    # Unification operator - used for assignment to `username` variable or for
+    # comparing to a `username` variable or rule defined elsewhere? Who knows.
+    username = input.user.name
+
+    # ...
+}
+
+allow {
+    # Unification operator used for comparison
+    input.request.method = "GET"
+}
+
+allow {
+    some user
+    input.request.path = ["users", user]
+    input.request.user == user
+}
+```
+
+**Prefer**
+```rego
+# Top level assignment using assignment operator
+roles := input.user.roles
+
+allow {
+    # Assignment operator used for assignment - no ambiguity around
+    # intent, or variable scope
+    username := input.user.name
+
+    # ... do something with username
+}
+
+allow {
+    # Comparison operator used for comparison
+    input.request.method == "GET"
+}
+
+allow {
+    input.request.path == ["users", input.request.user]
+}
+```
+
+**Notes / Exceptions**
+
+Unification was used extensively in older versions of OPA, and following that, in the policy examples provided in
+the OPA documentation, blogs, and elsewhere. With the assignment and comparison operators now available for use in
+any context, there is generally few reasons to use the unification operator in modern Rego.
+
+#### Related Resources
+- [Strict-mode to phase-out the "single =" operator](https://github.com/open-policy-agent/opa/issues/4688)
+- [OPA fmt 2.0](https://github.com/open-policy-agent/opa/issues/4508)
+
+### Don't use undeclared variables
+
+Using undeclared variables (i.e. not declred using `some` or `:=`) makes it harder to understand what's going on
+in a rule, and introduces ambiguities around scope.
+
+**Avoid**
+```rego
+messages[message] {
+	message := input.topics[topic].body
+}
+```
+
+**Prefer**
+```rego
+messages[message] {
+    some topic
+	message := input.topics[topic].body
+}
+
+# Alternatively
+
+messages[message] {
+    some topic in input.topics
+	message := topic.body
+}
+
+# or
+
+messages[message] {
+	message := input.topics[_].body
+}
+```
 
 ### Prefer sets over arrays (where applicable)
 
