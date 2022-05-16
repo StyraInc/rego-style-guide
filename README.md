@@ -22,6 +22,7 @@ entirety, pick what you like, or go your own way.
   - [Use `opa fmt`](#use-opa-fmt)
   - [Use strict mode](#use-strict-mode)
   - [Use metadata annotations](#use-metadata-annotations)
+  - [Get to know the built-in functions](#get-to-know-the-built-in-functions)
 - [Style](#style)
   - [Prefer snake_case for rule names and variables](#prefer-snakecase-for-rule-names-and-variables)
   - [Keep line length <= 120 characters](#keep-line-length--120-characters)
@@ -114,8 +115,8 @@ Use regular comments inside of rule bodies, or for packages and rules you consid
 
 ### Get to know the built-in functions
 
-With more than 150 built-in functions tailor-made for policy evaluation, there's a good chance that some of them can
-help you accomplish your goal.
+With more than 150 [built-in functions](https://www.openpolicyagent.org/docs/latest/policy-reference/#built-in-functions)
+tailor-made for policy evaluation, there's a good chance that some of them can help you accomplish your goal.
 
 ## Style
 
