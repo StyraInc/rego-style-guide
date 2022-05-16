@@ -27,6 +27,7 @@ entirety, pick what you like, or go your own way.
   - [Keep line length <= 120 characters](#keep-line-length--120-characters)
 - [Rules](#rules)
   - [Use established naming conventions](#use-established-naming-conventions)
+  - [Avoid prefixing rules and functions with `get_` or `list_`](#avoid-prefixing-rules-and-functions-with-get_-or-list_)
   - [Use helper rules](#use-helper-rules)
   - [Prefer repeated named rules over repeating rule bodies](#prefer-repeated-named-rules-over-repeating-rule-bodies)
 - [Variables and Data Types](#variables-and-data-types)
@@ -166,6 +167,46 @@ Policy that sticks to established naming conventions is easier to understand.
 
 1. Use `allow` for boolean rules generating a decision
 1. Use `deny`, `enforce`, or `violation` for partial rules generating a decision
+
+**Notes / Exceptions**
+
+Always prefer naming that makes the most sense for the context in which your policy operates. If you need to query OPA
+for a list of users, that rule should probably be named `users`.
+
+### Avoid prefixing rules and functions with `get_` or `list_`
+
+Since Rego evaluation is generally free of side effects, any rule or function is essentially a "getter". Adding a
+`get_` prefix to a rule or function (like `get_resources`) thus adds little of value compared to just naming it
+`resources`. Additionally, the type and return value of the rule should serve to tell whether a rule might return a
+single value (i.e. a complete rule) or a collection (a partial rule).
+
+**Avoid**
+```rego
+get_first_name(user) := split(user.name, " ")[0]
+
+# Partial rule, so a set of users is to be expected
+list_developers[developer] {
+    some user in data.application.users
+    user.type == "developer"
+}
+```
+
+**Prefer**
+```rego
+# "get" is implied
+first_name(user) := split(user.name, " ")[0]
+
+# Partial rule, so a set of users is to be expected
+developers[developer] {
+    some user in data.application.users
+    user.type == "developer"
+}
+```
+
+**Notes / Exceptions**
+
+Using `is_` for boolean helper functions, like `is_admin(user)` may be easier to comprehend than `admin(user)`. Avoid
+this for rules like `is_allowed` though.
 
 ### Use helper rules
 
