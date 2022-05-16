@@ -19,6 +19,8 @@ entirety, pick what you like, or go your own way.
 
 - [General Advice](#general-advice)
   - [Optimize for readability, not performance](#optimize-for-readability-not-performance)
+  - [Use `opa fmt`](#use-opa-fmt)
+  - [Use strict mode](#use-strict-mode)
   - [Use metadata annotations](#use-metadata-annotations)
 - [Style](#style)
   - [Prefer snake_case for rule names and variables](#prefer-snakecase-for-rule-names-and-variables)
@@ -36,9 +38,6 @@ entirety, pick what you like, or go your own way.
 - [Imports](#imports)
   - [Prefer importing modules over rules and functions](#prefer-importing-modules-over-rules-and-functions)
   - [Avoid importing `input`](#avoid-importing-input)
-- [Best Practices](#best-practices)
-  - [Use `opa fmt`](#use-opa-fmt)
-  - [Use strict mode](#use-strict-mode)
 
 ## General Advice
 
@@ -54,6 +53,20 @@ the problem at hand.
 
 #### Related Resources
 - [Policy Performance](https://www.openpolicyagent.org/docs/latest/policy-performance/)
+
+### Use `opa fmt`
+
+The `opa fmt` tool ensures consistent formatting across teams and projects. While certainly not
+[perfect](https://github.com/open-policy-agent/opa/issues/4508) (yet!), unified formatting is a big win, and saves a
+lot of time in code reviews arguing over details around style.
+
+A good idea could be to run `opa fmt --write` on save, which can be configured in most editors. If you want to enforce
+`opa fmt` formatting as part of your build pipeline, use `opa fmt --fail`.
+
+### Use strict mode
+
+Strict mode provides extra checks for common mistakes like redundant imports, or unused variables. Include
+an `opa check --strict path/to/polices` step as part of your build pipeline.
 
 ### Use metadata annotations
 
@@ -482,21 +495,3 @@ violations[message] {
     # ...
 }
 ```
-
-## Best Practices
-
-Some practices commonly considered best for Rego development.
-
-### Use `opa fmt`
-
-The `opa fmt` tool ensures consistent formatting across teams and projects. While certainly not
-[perfect](https://github.com/open-policy-agent/opa/issues/4508) (yet!), unified formatting is a big win, and saves a
-lot of time in code reviews arguing over style.
-
-A good idea could be to run `opa fmt --write` on save, which can be configured in most editors. If you want to enforce
-`opa fmt` formatting as part of your build pipeline, use `opa fmt --fail`.
-
-### Use strict mode
-
-Strict mode provides extra checks for common mistakes like redundant imports, or unused variables. Include
-an `opa check --strict path/to/polices` step as part of your build pipeline.
