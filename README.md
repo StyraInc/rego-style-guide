@@ -534,6 +534,30 @@ Unification was used extensively in older versions of OPA, and following that, i
 the OPA documentation, blogs, and elsewhere. With the assignment and comparison operators now available for use in
 any context, there is generally few reasons to use the unification operator in modern Rego.
 
+One notable exception is when matching e.g. the path of a request (as presented in array form), where you'll want to
+do both comparison and assignment to variables from the path components:
+
+```rego
+# Using unification - compact but clear
+router {
+	some user_id, podcast_id
+    ["users", user_id, "podcasts", podcast_id] = input.request.path
+
+    # .. do something with user_id, podcast_id
+}
+
+# Using comparison + assignment - arguably messier
+router {
+	input.request_path[0] == "users"
+    input.request_path[2] == "podcasts"
+
+    user_id := input.request_path[1]
+    podcast_id := input.request_path[3]
+
+    # .. do something with user_id, podcast_id
+}
+```
+
 #### Related Resources
 - [Strict-mode to phase-out the "single =" operator](https://github.com/open-policy-agent/opa/issues/4688)
 - [OPA fmt 2.0](https://github.com/open-policy-agent/opa/issues/4508)
