@@ -31,6 +31,7 @@ entirety, pick what you like, or go your own way.
   - [Use helper rules](#use-helper-rules)
   - [Prefer repeated named rules over repeating rule bodies](#prefer-repeated-named-rules-over-repeating-rule-bodies)
 - [Variables and Data Types](#variables-and-data-types)
+  - [Use `in` to check for membership](#use-in-to-check-for-membership)
   - [Don't use unification operator for assignment or comparison](#dont-use-unification-operator-for-assignment-or-comparison)
   - [Don't use undeclared variables](#dont-use-undeclared-variables)
   - [Prefer sets over arrays (where applicable)](#prefer-sets-over-arrays-where-applicable)
@@ -205,8 +206,8 @@ developers[developer] {
 
 **Notes / Exceptions**
 
-Using `is_` for boolean helper functions, like `is_admin(user)` may be easier to comprehend than `admin(user)`. Avoid
-this for rules like `is_allowed` though.
+Using `is_`, or `has_` for boolean helper functions, like `is_admin(user)` may be easier to comprehend than
+`admin(user)`. Avoid this for rules, like `is_allowed` though.
 
 ### Use helper rules
 
@@ -295,6 +296,48 @@ startswith_any(str, prefixes) {
 ```
 
 ## Variables and Data Types
+
+### Use `in` to check for membership
+
+Using `in` for membership checks clearly communicates intent, and is less prone to errors. This is especially true when
+checking if something is _not_ part of a collection.
+
+**Avoid**
+```rego
+# "Old" way of checking for membership - iteration + comparison
+allow {
+    "admin" == input.user.roles[_]
+}
+```
+
+**Prefer**
+```rego
+import future.keywords
+
+allow {
+    "admin" in input.user.roles
+}
+```
+
+**Avoid**
+```rego
+deny["Only admin allowed"] {
+    not user_is_admin
+}
+
+user_is_admin {
+    "admin" == input.user.roles[_]
+}
+```
+
+**Prefer**
+```rego
+import future.keywords
+
+deny["Only admin allowed"] {
+    not "admin" in input.user.roles
+}
+```
 
 ### Don't use unification operator for assignment or comparison
 
