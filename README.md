@@ -1,13 +1,15 @@
 # Rego Style Guide
 
 Given the general purpose nature of Open Policy Agent (OPA) — and the versatility of the Rego language — there is
-often more ways than one to express what one wants to accomplish. Even when setting pure _formatting_ concerns, like
-"how many spaces should be used for indentation?" or "should an array comprehension span multiple lines?" aside, coding
-style (and opionons around the topic) tends to encompass much more.
+often more ways than one to express what one wants to accomplish. Additionally, the Rego language has seen countless
+of improvements over the years, whether in the form of new features, built-in functions or language constructs. While
+it's "easy" to add things, great care needs to be taken about how to deal with _existing_ features and constructs, and
+with a strong commitment to not break backwards compatibility, sometimes the best way forward is simply to provide
+recommendations rather than deprecations or even having things removed.
 
-The purpose of this style guide is to provide a collection of recommendations and best practices for authoring Rego
-policy. As with any style guide - the advice provided here is highly subjective — although based on years of experience
-working with OPA and Rego.
+The purpose of this style guide is to provide a collection of recommendations and best practices for authoring modern
+Rego. As with any style guide - the advice provided here is subjective. Although based on years of experience working
+with OPA and Rego, the final decision on style yours to make.
 
 When deciding on style within a larger group of developers, finding acceptance (if not consensus) on a set of principles
 is often more important than the principles themselves. Use the rules provided here as you wish: adopt the guide in its
@@ -314,7 +316,7 @@ in a rule, and introduces ambiguities around scope.
 **Avoid**
 ```rego
 messages[message] {
-	message := input.topics[topic].body
+    message := input.topics[topic].body
 }
 ```
 
@@ -322,20 +324,20 @@ messages[message] {
 ```rego
 messages[message] {
     some topic
-	message := input.topics[topic].body
+    message := input.topics[topic].body
 }
 
 # Alternatively
 
 messages[message] {
     some topic in input.topics
-	message := topic.body
+    message := topic.body
 }
 
 # or
 
 messages[message] {
-	message := input.topics[_].body
+    message := input.topics[_].body
 }
 ```
 
