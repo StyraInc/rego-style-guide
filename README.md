@@ -33,6 +33,7 @@ entirety, pick what you like, or go your own way.
 - [Variables and Data Types](#variables-and-data-types)
   - [Use `in` to check for membership](#use-in-to-check-for-membership)
   - [Prefer `some .. in` for iteration](#prefer-some--in-for-iteration)
+  - [Use `every` to express FOR ALL](#use-every-to-express-for-all)
   - [Don't use unification operator for assignment or comparison](#dont-use-unification-operator-for-assignment-or-comparison)
   - [Don't use undeclared variables](#dont-use-undeclared-variables)
   - [Prefer sets over arrays (where applicable)](#prefer-sets-over-arrays-where-applicable)
@@ -408,6 +409,68 @@ all_hostnames := [hostname |
     hostname := server.hostname
 ]
 ```
+
+### Use `every` to express FOR ALL
+
+The `every` keyword makes it trivial to describe "for all" type expressions, which previously required the use of
+helper rules, or comparing counts of original collection against a filtered one produced by a comprehension.
+
+**Avoid**
+```rego
+import future.keywords
+
+allow {
+    # Negate result of _any_ match
+    not any_old_registry
+}
+
+any_old_registry {
+    some container in input.request.object.spec.containers
+    startswith(container.image, "old.docker.registry/")
+}
+```
+
+**Prefer**
+```rego
+import future.keywords
+
+allow {
+    every container in input.request.object.spec.containers {
+        not startswith(container.image, "old.docker.registry/")
+    }
+}
+```
+
+**Avoid**
+```rego
+words := ["always", "arbitrary", "air", "brand", "asphalt"]
+
+all_starts_with_a {
+    starts_with_a := [word |
+        some word in words
+        startswith(word, "a")
+    ]
+    count(starts_with_a) == count(words)
+}
+```
+
+**Prefer**
+```rego
+import future.keywords
+
+words := ["always", "arbitrary", "air", "brand", "asphalt"]
+
+all_starts_with_a {
+    every word in words {
+        startswith(word, "a")
+    }
+}
+```
+
+**Notes / Exceptions**
+
+Older versions of OPA used the `all` built-in function to check that all elements of an array had the value `true`.
+This function has been deprecated for a long time, and will eventually be removed.
 
 ### Don't use unification operator for assignment or comparison
 
