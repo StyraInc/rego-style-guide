@@ -32,6 +32,7 @@ entirety, pick what you like, or go your own way.
   - [Prefer repeated named rules over repeating rule bodies](#prefer-repeated-named-rules-over-repeating-rule-bodies)
 - [Variables and Data Types](#variables-and-data-types)
   - [Use `in` to check for membership](#use-in-to-check-for-membership)
+  - [Prefer `some .. in` for iteration](#prefer-some--in-for-iteration)
   - [Don't use unification operator for assignment or comparison](#dont-use-unification-operator-for-assignment-or-comparison)
   - [Don't use undeclared variables](#dont-use-undeclared-variables)
   - [Prefer sets over arrays (where applicable)](#prefer-sets-over-arrays-where-applicable)
@@ -337,6 +338,75 @@ import future.keywords
 deny["Only admin allowed"] {
     not "admin" in input.user.roles
 }
+```
+
+### Prefer `some .. in` for iteration
+
+Using the `some` .. `in` construct for iteration removes ambiguity around iteration vs. membership checks, and is
+generally more pleasant to read.
+
+```rego
+my_rule {
+    # Are we iterating users over a partial "other_rule" here,
+    # or checking if the set contains a user defined elsewhere?
+    other_rule[user]
+}
+```
+
+While this could be alleviated by declaring `some user` before the iteration, we can't take that consideration for
+granted when reading code from someone else.
+
+**Avoid**
+```rego
+# Iterating over array
+internal_hosts[hostname] {
+    host := data.network.hosts[_]
+    host.internal == true
+    hostname := host.name
+}
+
+# Iterating over object
+public_endpoints[endpoint] {
+    some endpoint
+    attributes := endpoints[endpoint]
+    attributes.public
+}
+```
+
+**Prefer**
+```rego
+import future.keywords
+
+internal_hosts[hostname] {
+    some host in data.network.hosts
+    host.internal == true
+    hostname := host.name
+}
+
+# Iterating over object
+public_endpoints[endpoint] {
+    some endpoint, attributes in endpoints
+    attributes.public
+}
+```
+
+**Notes / Exceptions**
+
+Using the "old" style of iteration may still be preferable when iterating over deeply nested structures.
+
+```rego
+# Building a list of all hostnames from a deeply nested structure
+
+all_hostnames := [hostname | hostname := data.regions[_].networks[_].servers[_].hostname]
+
+# ⬆️ is likely preferable over ⬇️
+
+all_hostnames := [hostname |
+    some region in data.regions
+    some network in region
+    some server in network
+    hostname := server.hostname
+]
 ```
 
 ### Don't use unification operator for assignment or comparison
