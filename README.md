@@ -217,7 +217,7 @@ deny["User ID missing from input"] {
 ```
 
 This is nice in that we'll get an even more granual message returned to the caller, but quickly becomes tedious when
-working with a large set of input data. To deal with this, a helper rule may be used.
+working with a large set of input data. To deal with this, negation on a helper rule may be used.
 
 **Prefer**
 ```rego
@@ -230,7 +230,11 @@ user_id_has_user_prefix {
 }
 ```
 
-Alternatively, `object.get` could be utilized in order to provide a default value for undefined values:
+In the above case, the `user_id_has_user_prefix` rule will fail **both** in the the undefined case, and if defined
+but not starting with `user:`. Since we negate the result of the helper rule in the `deny` rule, we'll have both
+cases covered.
+
+Alternatively, `object.get` could be used in order to provide a default value for undefined attributes.
 
 **Prefer**
 ```
@@ -239,6 +243,21 @@ deny["User ID must start with 'user:'"] {
     not startswith(user_id, "user:")
 }
 ```
+
+Using `object.get` is particularly helpful when you want to retrieve a value in a deeply nested structure, providing an
+array with the path to the object as the second argument.
+
+**Prefer**
+```
+first_user_id := user_id {
+    user_id := object.get(input, ["users", 0, "id"], "")
+    user_id != ""
+}
+```
+
+#### Related Resources
+- [object.get]()
+- [OPA AWS CloudFormation Hook Tutorial]()
 
 ### Use helper rules
 
@@ -704,7 +723,8 @@ allow {
 }
 ```
 
-Related reading: [Five things you didn't know about OPA](https://blog.styra.com/blog/five-things-you-didnt-know-about-opa).
+#### Related Resources
+- [Five things you didn't know about OPA](https://blog.styra.com/blog/five-things-you-didnt-know-about-opa).
 
 ## Regex
 
