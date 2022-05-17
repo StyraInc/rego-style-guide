@@ -3,17 +3,31 @@
 Given the general purpose nature of Open Policy Agent (OPA) — and the versatility of the Rego language — there is
 often more ways than one to express what one wants to accomplish. Additionally, the Rego language has seen countless
 of improvements over the years, whether in the form of new features, built-in functions or language constructs. While
-it's "easy" to add things, great care needs to be taken about how to deal with _existing_ features and constructs, and
-with a strong commitment to not break backwards compatibility, sometimes the best way forward is simply to provide
-recommendations rather than deprecations or even having things removed.
+it's "easy" to add things, great care needs to be taken with how to deal with _existing_ features and constructs.
+With a strong commitment to backwards compatibility, new features in OPA tend to live in parallell with older ones
+rather than replacing them entirely. Other times, patterns emerge out of experience, and some constructs prove to
+simply work really well over time.
 
 The purpose of this style guide is to provide a collection of recommendations and best practices for authoring modern
-Rego. As with any style guide - the advice provided here is subjective. Although based on years of experience working
-with OPA and Rego, the final decision on style yours to make.
+policy as code. Based on years of experience working with OPA and Rego, we hope to share some of our findings with you
+in a format that should be easy for anyone to consume.
 
-When deciding on style within a larger group of developers, finding acceptance (if not consensus) on a set of principles
-is often more important than the principles themselves. Use the rules provided here as you wish: adopt the guide in its
-entirety, pick what you like, or go your own way.
+As with any style guide - much of the advice provided here is subjective. When deciding on style within a larger group
+of developers, finding acceptance (if not consensus) on a set of principles is often more important than the principles
+themselves. Use the rules provided here as you wish: adopt the guide in its entirety, pick what you like, or go your
+own way.
+
+Since best practices change over time, make sure to check back every now and then. We intend to keep this project
+versioned, with any changes published included in the `CHANGELOG.md` file. This should allow you to quickly scan for
+updates in recommendations since you last checked in.
+
+## Contributing
+
+This document is meant to reflect the style preferences and best practices as compiled by the OPA community. As such,
+we welcome contributions from any of its members. Since most of the topics in a guide like this are likely subject to
+discussion, please open an issue, and allow some time for people to comment, before opening a PR.
+
+If you'd like to add or remove items for your own company, team or project, forking this repo is highly encouraged!
 
 ## Contents
 
@@ -31,6 +45,7 @@ entirety, pick what you like, or go your own way.
   - [Use established naming conventions](#use-established-naming-conventions)
   - [Handle undefined in partial rules](#handle-undefined-in-partial-rules)
   - [Use helper rules](#use-helper-rules)
+  - [Consider partial helper rules over comprehensions in rule bodies](#consider-partial-helper-rules-over-comprehensions-in-rule-bodies)
   - [Prefer repeated named rules over repeating rule bodies](#prefer-repeated-named-rules-over-repeating-rule-bodies)
   - [Avoid prefixing rules and functions with `get_` or `list_`](#avoid-prefixing-rules-and-functions-with-get_-or-list_)
 - [Variables and Data Types](#variables-and-data-types)
@@ -304,6 +319,60 @@ is_developer {
 
 Additionally, helper rules and functions may be kept in (and imported from) separate modules, allowing you to build a
 logical — and reusable! — structure for your policy files.
+
+### Consider partial helper rules over comprehensions in rule bodies
+
+While advanced comprehensions inside of rule bodies allows for compact rules, these are often harder to debug, and
+can't easily be reused by other rules. Partial rules may be referenced by any other rule, and more importantly, by you!
+Having many smaller, composable rules, is often key to quickly identifying where things fail, as each rule may be
+queried individually.
+
+**Avoid**
+```rego
+import future.keywords
+
+allow {
+    input.request.method in {"GET", "HEAD"}
+    input.request.path[0] == "credit_reports"
+    input.user.name in {username |
+        # These should not count as MFA
+        insecure_methods := {"email"}
+
+        some user in data.users
+        mfa_methods := {method | some method in user.authentication.methods} - insecure_methods
+
+        count(mfa_methods) > 1
+        username := user.name
+    }
+}
+```
+
+**Prefer**
+```rego
+import future.keywords
+
+allow {
+    input.request.method in {"GET", "HEAD"}
+    input.request.path[0] == "credit_reports"
+    input.user.name in mfa_authenticated_users
+}
+
+mfa_authenticated_users[username] {
+    # These should not count as MFA
+    insecure_methods := {"email"}
+
+    some user in data.users
+    mfa_methods := {method | some method in user.authentication.methods} - insecure_methods
+
+    count(mfa_methods) > 1
+    username := user.name
+}
+```
+
+**Notes / Exceptions**
+
+Does not apply if ordering is of importance, or duplicate values should be allowed. For those cases, use array
+comprehensions.
 
 ### Prefer repeated named rules over repeating rule bodies
 
