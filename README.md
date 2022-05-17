@@ -23,14 +23,16 @@ entirety, pick what you like, or go your own way.
   - [Use strict mode](#use-strict-mode)
   - [Use metadata annotations](#use-metadata-annotations)
   - [Get to know the built-in functions](#get-to-know-the-built-in-functions)
+  - [Consider using JSON schemas for type checking](#consider-using-json-schemas-for-type-checking)
 - [Style](#style)
   - [Prefer snake_case for rule names and variables](#prefer-snakecase-for-rule-names-and-variables)
   - [Keep line length <= 120 characters](#keep-line-length--120-characters)
 - [Rules](#rules)
   - [Use established naming conventions](#use-established-naming-conventions)
-  - [Avoid prefixing rules and functions with `get_` or `list_`](#avoid-prefixing-rules-and-functions-with-get_-or-list_)
+  - [Handle undefined in partial rules](#handle-undefined-in-partial-rules)
   - [Use helper rules](#use-helper-rules)
   - [Prefer repeated named rules over repeating rule bodies](#prefer-repeated-named-rules-over-repeating-rule-bodies)
+  - [Avoid prefixing rules and functions with `get_` or `list_`](#avoid-prefixing-rules-and-functions-with-get_-or-list_)
 - [Variables and Data Types](#variables-and-data-types)
   - [Use `in` to check for membership](#use-in-to-check-for-membership)
   - [Prefer `some .. in` for iteration](#prefer-some--in-for-iteration)
@@ -68,10 +70,13 @@ lot of time in code reviews arguing over details around style.
 A good idea could be to run `opa fmt --write` on save, which can be configured in most editors. If you want to enforce
 `opa fmt` formatting as part of your build pipeline, use `opa fmt --fail`.
 
+In order to not flood this guide with data, formatting conventions covered by `opa fmt` will not be included here.
+
 ### Use strict mode
 
-Strict mode provides extra checks for common mistakes like redundant imports, or unused variables. Include
-an `opa check --strict path/to/polices` step as part of your build pipeline.
+[Strict mode](https://www.openpolicyagent.org/docs/latest/strict/) provides extra checks for common mistakes like
+redundant imports, or unused variables. Include an `opa check --strict path/to/polices` step as part of your build
+pipeline.
 
 ### Use metadata annotations
 
@@ -117,6 +122,13 @@ Use regular comments inside of rule bodies, or for packages and rules you consid
 
 With more than 150 [built-in functions](https://www.openpolicyagent.org/docs/latest/policy-reference/#built-in-functions)
 tailor-made for policy evaluation, there's a good chance that some of them can help you accomplish your goal.
+
+### Consider using JSON schemas for type checking
+
+As you author Rego policy, providing JSON schemas for your `input` (and possibly `data`) enables strict
+[type checking](https://www.openpolicyagent.org/docs/latest/schemas/), letting you avoid simple — but common — mistakes,
+like typos, or referencing nested attributes in the wrong location. This extra level of verification improves both the
+developer experience as well as the quality of your policies.
 
 ## Style
 
@@ -177,40 +189,56 @@ Policy that sticks to established naming conventions is easier to understand.
 Always prefer naming that makes the most sense for the context in which your policy operates. If you need to query OPA
 for a list of users, that rule should probably be named `users`.
 
-### Avoid prefixing rules and functions with `get_` or `list_`
+### Handle undefined in partial rules
 
-Since Rego evaluation is generally free of side effects, any rule or function is essentially a "getter". Adding a
-`get_` prefix to a rule or function (like `get_resources`) thus adds little of value compared to just naming it
-`resources`. Additionally, the type and return value of the rule should serve to tell whether a rule might return a
-single value (i.e. a complete rule) or a collection (a partial rule).
+When writing partial rules (i.e. rules that build
+[sets](https://www.openpolicyagent.org/docs/latest/policy-language/#generating-sets) or
+[objects](https://www.openpolicyagent.org/docs/latest/policy-language/#generating-objects)),
+extra consideration needs to be given to potential undefined attributes and values.
+Consider for example this simple rule:
 
 **Avoid**
 ```rego
-get_first_name(user) := split(user.name, " ")[0]
-
-# Partial rule, so a set of users is to be expected
-list_developers[developer] {
-    some user in data.application.users
-    user.type == "developer"
+deny["User ID must start with 'user:'"] {
+    not startswith(input.user_id, "user:")
 }
 ```
+
+At first glance, it might seem obvious that evaluating the rule should add a violation to the set of messages if the
+`user_id` provided in `input` doesn't start with `user:`. But what happens if there is no `user_id` provided _at all_?
+Evaluation will stop when encountering undefined, and the `startswith` function will never be invoked, leading to
+**nothing** being added to the `deny` set — the rule allows someone without a `user_id`! We could of course add another
+rule, checking only for its presence:
+
+```rego
+deny["User ID missing from input"] {
+    not input.user_id
+}
+```
+
+This is nice in that we'll get an even more granual message returned to the caller, but quickly becomes tedious when
+working with a large set of input data. To deal with this, a helper rule may be used.
 
 **Prefer**
 ```rego
-# "get" is implied
-first_name(user) := split(user.name, " ")[0]
+deny["User ID must start with 'user:'"] {
+    not user_id_has_user_prefix
+}
 
-# Partial rule, so a set of users is to be expected
-developers[developer] {
-    some user in data.application.users
-    user.type == "developer"
+user_id_has_user_prefix {
+    startswith(input.user_id, "user:")
 }
 ```
 
-**Notes / Exceptions**
+Alternatively, `object.get` could be utilized in order to provide a default value for undefined values:
 
-Using `is_`, or `has_` for boolean helper functions, like `is_admin(user)` may be easier to comprehend than
-`admin(user)`. Avoid this for rules, like `is_allowed` though.
+**Prefer**
+```
+deny["User ID must start with 'user:'"] {
+    user_id := object.get(input, "user_id", "")
+    not startswith(user_id, "user:")
+}
+```
 
 ### Use helper rules
 
@@ -297,6 +325,41 @@ startswith_any(str, prefixes) {
     startswith(str, prefix)
 }
 ```
+
+### Avoid prefixing rules and functions with `get_` or `list_`
+
+Since Rego evaluation is generally free of side effects, any rule or function is essentially a "getter". Adding a
+`get_` prefix to a rule or function (like `get_resources`) thus adds little of value compared to just naming it
+`resources`. Additionally, the type and return value of the rule should serve to tell whether a rule might return a
+single value (i.e. a complete rule) or a collection (a partial rule).
+
+**Avoid**
+```rego
+get_first_name(user) := split(user.name, " ")[0]
+
+# Partial rule, so a set of users is to be expected
+list_developers[developer] {
+    some user in data.application.users
+    user.type == "developer"
+}
+```
+
+**Prefer**
+```rego
+# "get" is implied
+first_name(user) := split(user.name, " ")[0]
+
+# Partial rule, so a set of users is to be expected
+developers[developer] {
+    some user in data.application.users
+    user.type == "developer"
+}
+```
+
+**Notes / Exceptions**
+
+Using `is_`, or `has_` for boolean helper functions, like `is_admin(user)` may be easier to comprehend than
+`admin(user)`.
 
 ## Variables and Data Types
 
