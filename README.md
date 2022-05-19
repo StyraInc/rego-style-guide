@@ -46,7 +46,6 @@ If you'd like to add or remove items for your own company, team or project, fork
   - [Handle undefined in partial rules](#handle-undefined-in-partial-rules)
   - [Use helper rules](#use-helper-rules)
   - [Consider partial helper rules over comprehensions in rule bodies](#consider-partial-helper-rules-over-comprehensions-in-rule-bodies)
-  - [Prefer repeated named rules over repeating rule bodies](#prefer-repeated-named-rules-over-repeating-rule-bodies)
   - [Avoid prefixing rules and functions with `get_` or `list_`](#avoid-prefixing-rules-and-functions-with-get_-or-list_)
 - [Variables and Data Types](#variables-and-data-types)
   - [Use `in` to check for membership](#use-in-to-check-for-membership)
@@ -373,46 +372,6 @@ mfa_authenticated_users[username] {
 
 Does not apply if ordering is of importance, or duplicate values should be allowed. For those cases, use array
 comprehensions.
-
-### Prefer repeated named rules over repeating rule bodies
-
-While (purposely!) not well-documented, a rule may have its **body** repeated to describe OR conditions, identical
-to what you'd normally see repeated in another rule declaration with the same name. While this tends to make things
-more compact, it results in policy which could be difficult to understand, even for someone carefully reading the
-documentation.
-
-**Avoid**
-```rego
-allow {
-    startswith(input.request.path, "/public")
-} {
-    startswith(input.request.path, "/static")
-}
-```
-
-**Prefer**
-```rego
-allow {
-    startswith(input.request.path, "/public")
-}
-
-allow {
-    startswith(input.request.path, "/static")
-}
-```
-
-**Prefer**
-```rego
-allow {
-    # Alternatively, delegate OR condition to helper rule
-    startswith_any(input.request.path, {"/public", "/static"})
-}
-
-startswith_any(str, prefixes) {
-    some prefix in prefixes
-    startswith(str, prefix)
-}
-```
 
 ### Avoid prefixing rules and functions with `get_` or `list_`
 
