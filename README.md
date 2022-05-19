@@ -1,10 +1,10 @@
 # Rego Style Guide
 
 Given the general purpose nature of Open Policy Agent (OPA) — and the versatility of the Rego language — there is
-often more ways than one to express what one wants to accomplish. Additionally, the Rego language has seen countless
-of improvements over the years, whether in the form of new features, built-in functions or language constructs. While
+often more than one way to express what one wants to accomplish. Additionally, the Rego language has seen countless
+improvements over the years, whether in the form of new features, built-in functions, or language constructs. While
 it's "easy" to add things, great care needs to be taken with how to deal with _existing_ features and constructs.
-With a strong commitment to backwards compatibility, new features in OPA tend to live in parallell with older ones
+With a strong commitment to backwards compatibility, new features in OPA tend to live in parallel with older ones
 rather than replacing them entirely. Other times, patterns emerge out of experience, and some constructs prove to
 simply work really well over time.
 
@@ -63,12 +63,12 @@ If you'd like to add or remove items for your own company, team or project, fork
 
 ### Optimize for readability, not performance
 
-Rego is a declarative language, which in the best of worlds means you express **what** you want rather than **how** it
+Rego is a declarative language, which in the best case means you express **what** you want rather than **how** it
 should be retrieved. When authoring policy, do not try to be "smart" about assumed performance characteristics or
 optimizations. That's what OPA should worry about!
 
 Optimize for **readbility** and **obviousness**. Optimize for performance *only* if you've identified performance
-issues in your policy, and even if you do — making your policy more compact or "clever" almost never helps addressing
+issues in your policy, and even if you do — making your policy more compact or "clever" almost never helps at addressing
 the problem at hand.
 
 #### Related Resources
@@ -147,7 +147,7 @@ developer experience as well as the quality of your policies.
 
 ### Prefer snake_case for rule names and variables
 
-The built-in functions use `snake_case` for naming — follow that convention for your own rules, functions and variables.
+The built-in functions use `snake_case` for naming — follow that convention for your own rules, functions, and variables.
 
 **Avoid**
 ```rego
@@ -512,7 +512,8 @@ all_hostnames := [hostname |
 ### Use `every` to express FOR ALL
 
 The `every` keyword makes it trivial to describe "for all" type expressions, which previously required the use of
-helper rules, or comparing counts of original collection against a filtered one produced by a comprehension.
+helper rules, or comparing counts of items in the original collection against a filtered one produced by a
+comprehension.
 
 **Avoid**
 ```rego
@@ -631,10 +632,10 @@ allow {
 
 Unification was used extensively in older versions of OPA, and following that, in the policy examples provided in
 the OPA documentation, blogs, and elsewhere. With the assignment and comparison operators now available for use in
-any context, there is generally few reasons to use the unification operator in modern Rego.
+any context, there are generally few reasons to use the unification operator in modern Rego.
 
-One notable exception is when matching e.g. the path of a request (as presented in array form), where you'll want to
-do both comparison and assignment to variables from the path components:
+One notable exception is when matching for example, the path of a request (as presented in array form),
+where you'll want to do both comparison and assignment to variables from the path components:
 
 ```rego
 # Using unification - compact but clear
@@ -663,7 +664,7 @@ router {
 
 ### Don't use undeclared variables
 
-Using undeclared variables (i.e. not declred using `some` or `:=`) makes it harder to understand what's going on
+Using undeclared variables (i.e. not declared using `some` or `:=`) makes it harder to understand what's going on
 in a rule, and introduces ambiguities around scope.
 
 **Avoid**
@@ -768,7 +769,7 @@ all_digits {
 ### Prefer importing modules over rules and functions
 
 Importing modules rather than specific rules and functions allows you to reference them by the module name, making it
-obvious where the rule or function was declared. Additionally, well named packages help provide context to assertions.
+obvious where the rule or function was declared. Additionally, well-named packages help provide context to assertions.
 
 **Avoid**
 ```rego
@@ -791,8 +792,8 @@ allow {
 ### Avoid importing `input`
 
 While importing attributes from the global `input` variable might eliminate some levels of nesting, it makes the origin
-of the attribute(s) less apparent. Clearly differentiating `input` and `data` from and values, functions and rules
-defined inside of the same module helps making things _obvious_, and few things beat obviousness!
+of the attribute(s) less apparent. Clearly differentiating `input` and `data` from values, functions, and rules
+defined inside of the same module helps in making things _obvious_, and few things beat obviousness!
 
 **Avoid**
 ```rego
@@ -824,8 +825,8 @@ fin_dept {
 
 **Notes / Exceptions**
 
-In some contexts, the source of data is obvious even when imported and/or renamed. A common practice is for example
-to rename `input` in Terraform policies, either via `import` or a new top level variable.
+In some contexts, the source of data is obvious even when imported and/or renamed. A common practice is
+to rename `input` in Terraform policies for example, either via `import` or a new top-level variable.
 
 ```rego
 import input as tfplan
