@@ -42,7 +42,6 @@ If you'd like to add or remove items for your own company, team or project, fork
   - [Prefer snake_case for rule names and variables](#prefer-snakecase-for-rule-names-and-variables)
   - [Keep line length <= 120 characters](#keep-line-length--120-characters)
 - [Rules](#rules)
-  - [Use established naming conventions](#use-established-naming-conventions)
   - [Handle undefined in partial rules](#handle-undefined-in-partial-rules)
   - [Use helper rules](#use-helper-rules)
   - [Consider partial helper rules over comprehensions in rule bodies](#consider-partial-helper-rules-over-comprehensions-in-rule-bodies)
@@ -191,18 +190,6 @@ frontend_admin_users := [username |
 
 ## Rules
 
-### Use established naming conventions
-
-Policy that sticks to established naming conventions is easier to understand.
-
-1. Use `allow` for boolean rules generating a decision
-1. Use `deny`, `enforce`, or `violation` for partial rules generating a decision
-
-**Notes / Exceptions**
-
-Always prefer naming that makes the most sense for the context in which your policy operates. If you need to query OPA
-for a list of users, that rule should probably be named `users`.
-
 ### Handle undefined in partial rules
 
 When writing partial rules (i.e. rules that build
@@ -275,7 +262,8 @@ first_user_id := user_id {
 
 ### Use helper rules
 
-Helper rules makes policies more readable, and for repeated conditions more performant as well.
+Helper rules makes policies more readable, and for repeated conditions more performant as well. If your rule contains
+more than a few simple expressions, consider splitting it into multiple rules with good names.
 
 **Avoid**
 ```rego
@@ -321,8 +309,8 @@ logical — and reusable! — structure for your policy files.
 
 ### Consider partial helper rules over comprehensions in rule bodies
 
-While advanced comprehensions inside of rule bodies allows for compact rules, these are often harder to debug, and
-can't easily be reused by other rules. Partial rules may be referenced by any other rule, and more importantly, by you!
+While comprehensions inside of rule bodies allows for compact rules, these are often harder to debug, and can't easily
+be reused by other rules. Partial rules may be referenced by any other rule, and more importantly, by you!
 Having many smaller, composable rules, is often key to quickly identifying where things fail, as each rule may be
 queried individually.
 
