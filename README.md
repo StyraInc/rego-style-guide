@@ -240,25 +240,29 @@ logical — and reusable! — structure for your policy files.
 ### Use negation to handle undefined
 
 When encountering undefined references inside of rules, evaluation of the rule halts and the rule _itself_ evaluates to
-undefined.
+undefined, unless of course, a `default` value has been provided. While saying `allow is undefined` or `allow is false`
+if encountering undefined in a rule is likely desirable, this doesn't hold true when working with "inverted" rules -
+i.e. rules like `deny` (as opposed to `allow`). Saying `deny is undefined` or `deny is false` if undefined is
+encountered, essentially means that any occurence of undefined (such as when attributes are missing in the input
+document) would lead to the `deny` rule not getting enforced. This is particularly common writing partial rules (i.e.
+rules that build [sets](https://www.openpolicyagent.org/docs/latest/policy-language/#generating-sets) or
+[objects](https://www.openpolicyagent.org/docs/latest/policy-language/#generating-objects)).
 
-When writing partial rules (i.e. rules that build
-[sets](https://www.openpolicyagent.org/docs/latest/policy-language/#generating-sets) or
-[objects](https://www.openpolicyagent.org/docs/latest/policy-language/#generating-objects)),
-extra consideration needs to be given to potential undefined attributes and values.
 Consider for example this simple rule:
 
 **Avoid**
 ```rego
-deny["User ID must start with 'user:'"] {
-    not startswith(input.user_id, "user:")
+authorized := count(deny) == 0
+
+deny["User is anonymous"] {
+    input.user_id == "anonymous"
 }
 ```
 
 At first glance, it might seem obvious that evaluating the rule should add a violation to the set of messages if the
-`user_id` provided in `input` doesn't start with `user:`. But what happens if there is no `user_id` provided _at all_?
-Evaluation will stop when encountering undefined, and the `startswith` function will never be invoked, leading to
-**nothing** being added to the `deny` set — the rule allows someone without a `user_id`! We could of course add another
+`user_id` provided in `input` is equal to "anonymous". But what happens if there is no `user_id` provided _at all_?
+Evaluation will stop when encountering undefined, and the comparison will never be invoked, leading to **nothing**
+being added to the `deny` set — the rule allows someone without a `user_id`. We could of course add another
 rule, checking only for its presence:
 
 ```rego
@@ -268,21 +272,23 @@ deny["User ID missing from input"] {
 ```
 
 This is nice in that we'll get an even more granual message returned to the caller, but quickly becomes tedious when
-working with a large set of input data. To deal with this, negation on a helper rule may be used.
+working with a large set of input data. To deal with this, a helper rule using _negation_ may be used.
 
 **Prefer**
 ```rego
-deny["User ID must start with 'user:'"] {
-    not user_id_has_user_prefix
+authorized := count(deny) == 0
+
+deny["User is anonymous"] {
+    not authenticated_user
 }
 
-user_id_has_user_prefix {
-    startswith(input.user_id, "user:")
+authenticated_user {
+    input.user_id != "anonymous"
 }
 ```
 
-In the above case, the `user_id_has_user_prefix` rule will fail **both** in the the undefined case, and if defined
-but not starting with `user:`. Since we negate the result of the helper rule in the `deny` rule, we'll have both
+In the above case, the `authenticated_user` rule will fail **both** in the the undefined case, and if defined
+but equal to "anonymous". Since we negate the result of the helper rule in the `deny` rule, we'll have both
 cases covered.
 
 #### Related Resources
