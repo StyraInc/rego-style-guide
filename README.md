@@ -42,8 +42,8 @@ If you'd like to add or remove items for your own company, team or project, fork
   - [Prefer snake_case for rule names and variables](#prefer-snakecase-for-rule-names-and-variables)
   - [Keep line length <= 120 characters](#keep-line-length--120-characters)
 - [Rules](#rules)
-  - [Handle undefined in partial rules](#handle-undefined-in-partial-rules)
-  - [Use helper rules](#use-helper-rules)
+  - [Use helper rules and functions](#use-helper-rules-and-functions)
+  - [Use negation to handle undefined](#use-negation-to-handle-undefined)
   - [Consider partial helper rules over comprehensions in rule bodies](#consider-partial-helper-rules-over-comprehensions-in-rule-bodies)
   - [Avoid prefixing rules and functions with `get_` or `list_`](#avoid-prefixing-rules-and-functions-with-get_-or-list_)
 - [Variables and Data Types](#variables-and-data-types)
@@ -190,77 +190,7 @@ frontend_admin_users := [username |
 
 ## Rules
 
-### Handle undefined in partial rules
-
-When writing partial rules (i.e. rules that build
-[sets](https://www.openpolicyagent.org/docs/latest/policy-language/#generating-sets) or
-[objects](https://www.openpolicyagent.org/docs/latest/policy-language/#generating-objects)),
-extra consideration needs to be given to potential undefined attributes and values.
-Consider for example this simple rule:
-
-**Avoid**
-```rego
-deny["User ID must start with 'user:'"] {
-    not startswith(input.user_id, "user:")
-}
-```
-
-At first glance, it might seem obvious that evaluating the rule should add a violation to the set of messages if the
-`user_id` provided in `input` doesn't start with `user:`. But what happens if there is no `user_id` provided _at all_?
-Evaluation will stop when encountering undefined, and the `startswith` function will never be invoked, leading to
-**nothing** being added to the `deny` set — the rule allows someone without a `user_id`! We could of course add another
-rule, checking only for its presence:
-
-```rego
-deny["User ID missing from input"] {
-    not input.user_id
-}
-```
-
-This is nice in that we'll get an even more granual message returned to the caller, but quickly becomes tedious when
-working with a large set of input data. To deal with this, negation on a helper rule may be used.
-
-**Prefer**
-```rego
-deny["User ID must start with 'user:'"] {
-    not user_id_has_user_prefix
-}
-
-user_id_has_user_prefix {
-    startswith(input.user_id, "user:")
-}
-```
-
-In the above case, the `user_id_has_user_prefix` rule will fail **both** in the the undefined case, and if defined
-but not starting with `user:`. Since we negate the result of the helper rule in the `deny` rule, we'll have both
-cases covered.
-
-Alternatively, `object.get` could be used in order to provide a default value for undefined attributes.
-
-**Prefer**
-```
-deny["User ID must start with 'user:'"] {
-    user_id := object.get(input, "user_id", "")
-    not startswith(user_id, "user:")
-}
-```
-
-Using `object.get` is particularly helpful when you want to retrieve a value in a deeply nested structure, providing an
-array with the path to the object as the second argument.
-
-**Prefer**
-```
-first_user_id := user_id {
-    user_id := object.get(input, ["users", 0, "id"], "")
-    user_id != ""
-}
-```
-
-#### Related Resources
-- [object.get]()
-- [OPA AWS CloudFormation Hook Tutorial]()
-
-### Use helper rules
+### Use helper rules and functions
 
 Helper rules makes policies more readable, and for repeated conditions more performant as well. If your rule contains
 more than a few simple expressions, consider splitting it into multiple rules with good names.
@@ -306,6 +236,57 @@ is_developer {
 
 Additionally, helper rules and functions may be kept in (and imported from) separate modules, allowing you to build a
 logical — and reusable! — structure for your policy files.
+
+### Use negation to handle undefined
+
+When encountering undefined references inside of rules, evaluation of the rule halts and the rule _itself_ evaluates to
+undefined.
+
+When writing partial rules (i.e. rules that build
+[sets](https://www.openpolicyagent.org/docs/latest/policy-language/#generating-sets) or
+[objects](https://www.openpolicyagent.org/docs/latest/policy-language/#generating-objects)),
+extra consideration needs to be given to potential undefined attributes and values.
+Consider for example this simple rule:
+
+**Avoid**
+```rego
+deny["User ID must start with 'user:'"] {
+    not startswith(input.user_id, "user:")
+}
+```
+
+At first glance, it might seem obvious that evaluating the rule should add a violation to the set of messages if the
+`user_id` provided in `input` doesn't start with `user:`. But what happens if there is no `user_id` provided _at all_?
+Evaluation will stop when encountering undefined, and the `startswith` function will never be invoked, leading to
+**nothing** being added to the `deny` set — the rule allows someone without a `user_id`! We could of course add another
+rule, checking only for its presence:
+
+```rego
+deny["User ID missing from input"] {
+    not input.user_id
+}
+```
+
+This is nice in that we'll get an even more granual message returned to the caller, but quickly becomes tedious when
+working with a large set of input data. To deal with this, negation on a helper rule may be used.
+
+**Prefer**
+```rego
+deny["User ID must start with 'user:'"] {
+    not user_id_has_user_prefix
+}
+
+user_id_has_user_prefix {
+    startswith(input.user_id, "user:")
+}
+```
+
+In the above case, the `user_id_has_user_prefix` rule will fail **both** in the the undefined case, and if defined
+but not starting with `user:`. Since we negate the result of the helper rule in the `deny` rule, we'll have both
+cases covered.
+
+#### Related Resources
+- [OPA AWS CloudFormation Hook Tutorial](https://www.openpolicyagent.org/docs/latest/aws-cloudformation-hooks/)
 
 ### Consider partial helper rules over comprehensions in rule bodies
 
