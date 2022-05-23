@@ -53,6 +53,9 @@ If you'd like to add or remove items for your own company, team or project, fork
   - [Don't use unification operator for assignment or comparison](#dont-use-unification-operator-for-assignment-or-comparison)
   - [Don't use undeclared variables](#dont-use-undeclared-variables)
   - [Prefer sets over arrays (where applicable)](#prefer-sets-over-arrays-where-applicable)
+- [Functions](#functions)
+  - [Prefer using arguments over `input` and `data`](#prefer-using-arguments-over-input-and-data)
+  - [Avoid using the last argument for the return value](#avoid-using-the-last-argument-for-the-return-value)
 - [Regex](#regex)
   - [Use raw strings for regex patterns](#use-raw-strings-for-regex-patterns)
 - [Imports](#imports)
@@ -729,6 +732,64 @@ allow {
 
 #### Related Resources
 - [Five things you didn't know about OPA](https://blog.styra.com/blog/five-things-you-didnt-know-about-opa).
+
+## Functions
+
+### Prefer using arguments over `input` and `data`
+
+What separates functions from rules is that they accept _arguments_. While a function too may reference anything from
+`input` and `data`, these references create dependencies that aren't obvious simply by checking the function signature,
+and it makes it harder to reuse that function in other contexts. Additionally, functions that only depend
+on their arguments are easier to test standalone.
+
+**Avoid**
+```rego
+# Depends on both `input` and `data`
+is_preferred_login_method(method) {
+    preferred_login_methods := {login_method |
+        some login_method in data.authentication.all_login_methods
+        login_method in input.user.login_methods
+    }
+    method in preferred_login_methods
+}
+```
+
+**Prefer**
+```rego
+# Depends only on function arguments
+is_preferred_login_method(method, user, all_login_methods) {
+    preferred_login_methods := {login_method |
+        some login_method in all_login_methods
+        login_method in user.login_methods
+    }
+    method in preferred_login_methods
+}
+```
+
+### Avoid using the last argument for the return value
+
+Older Rego policies sometimes contain an unusual way to declare where the return value of a function call should be
+stored — the last argument of the function. True to it's
+[Datalog](https://www.openpolicyagent.org/docs/latest/policy-language/#what-is-rego) roots, return values may be stored
+either using assignment (i.e. `:=`) or by appending a variable name to the argument list of a function. These two
+expressions are thus equivalent:
+
+**Avoid**
+```rego
+first_a := i {
+    indexof("answer", "a", i)
+}
+```
+
+**Prefer**
+```rego
+first_a := i {
+    i := indexof("answer", "a")
+}
+```
+
+While the second form is valid, it is almost guaranteed to confuse developers coming from the most common programming
+languages. Again, optimize for readability!
 
 ## Regex
 
