@@ -1,33 +1,12 @@
 # Rego Style Guide
 
-Given the general purpose nature of Open Policy Agent (OPA) — and the versatility of the Rego language — there is
-often more than one way to express what one wants to accomplish. Additionally, the Rego language has seen countless
-improvements over the years, whether in the form of new features, built-in functions, or language constructs. While
-it's "easy" to add things, great care needs to be taken with how to deal with _existing_ features and constructs.
-With a strong commitment to backwards compatibility, new features in OPA tend to live in parallel with older ones
-rather than replacing them entirely. Other times, patterns emerge out of experience, and some constructs prove to
-simply work really well over time.
-
 The purpose of this style guide is to provide a collection of recommendations and best practices for authoring modern
-policy as code. Based on years of experience working with OPA and Rego, we hope to share some of our findings with you
-in a format that should be easy for anyone to consume.
+Rego. From Styra, the founders of Open Policy Agent (OPA), and some of the most experienced members of the community,
+we hope to share some lessons learnt from authoring hundreds of thousands of lines of production policy over the years.
 
-As with any style guide - much of the advice provided here is subjective. When deciding on style within a larger group
-of developers, finding acceptance (if not consensus) on a set of principles is often more important than the principles
-themselves. Use the rules provided here as you wish: adopt the guide in its entirety, pick what you like, or go your
-own way.
-
-Since best practices change over time, make sure to check back every now and then. We intend to keep this project
-versioned, with any changes published included in the `CHANGELOG.md` file. This should allow you to quickly scan for
-updates in recommendations since you last checked in.
-
-## Contributing
-
-This document is meant to reflect the style preferences and best practices as compiled by the OPA community. As such,
-we welcome contributions from any of its members. Since most of the topics in a guide like this are likely subject to
-discussion, please open an issue, and allow some time for people to comment, before opening a PR.
-
-If you'd like to add or remove items for your own company, team or project, forking this repo is highly encouraged!
+With new features, language constructs, and other improvements continuously finding their way into OPA, we aim to keep
+this style guide a reflection of what we consider current best practices. Make sure to check back every once in a while,
+and see the changelog for updates since your last visit.
 
 ## Contents
 
@@ -890,3 +869,13 @@ violations[message] {
     # ...
 }
 ```
+
+---
+
+## Contributing
+
+This document is meant to reflect the style preferences and best practices as compiled by the OPA community. As such,
+we welcome contributions from any of its members. Since most of the topics in a guide like this are likely subject to
+discussion, please open an issue, and allow some time for people to comment, before opening a PR.
+
+If you'd like to add or remove items for your own company, team or project, forking this repo is highly encouraged!
