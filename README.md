@@ -669,6 +669,7 @@ messages[message] {
 }
 
 # Alternatively
+import future.keywords
 
 messages[message] {
     some topic in input.topics
@@ -697,6 +698,8 @@ For any applicable sequence of values, sets have the following benefits over arr
 
 **Avoid**
 ```rego
+import future.keywords
+
 required_roles := ["accountant", "reports-writer"]
 provided_roles := [role | some role in input.user.roles]
 
@@ -709,6 +712,8 @@ allow {
 
 **Prefer**
 ```rego
+import future.keywords
+
 required_roles := {"accountant", "reports-writer"}
 provided_roles := {role | some role in input.user.roles}
 
