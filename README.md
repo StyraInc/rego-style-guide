@@ -1,8 +1,8 @@
 # Rego Style Guide
 
-The purpose of this style guide is to provide a collection of recommendations and best practices for authoring modern
-Rego. From Styra, the founders of Open Policy Agent (OPA), and some of the most experienced members of the community,
-we hope to share some lessons learnt from authoring hundreds of thousands of lines of production policy over the years.
+The purpose of this style guide is to provide a collection of recommendations and best practices for authoring Rego.
+From Styra, the founders of Open Policy Agent (OPA), and some of the most experienced members of the community,
+we hope to share lessons learnt from authoring and reviewing hundreds of thousands of lines of Rego over the years.
 
 With new features, language constructs, and other improvements continuously finding their way into OPA, we aim to keep
 this style guide a reflection of what we consider current best practices. Make sure to check back every once in a while,
