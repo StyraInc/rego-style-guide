@@ -18,7 +18,7 @@ and see the changelog for updates since your last visit.
   - [Get to know the built-in functions](#get-to-know-the-built-in-functions)
   - [Consider using JSON schemas for type checking](#consider-using-json-schemas-for-type-checking)
 - [Style](#style)
-  - [Prefer snake_case for rule names and variables](#prefer-snakecase-for-rule-names-and-variables)
+  - [Prefer snake_case for rule names and variables](#prefer-snake_case-for-rule-names-and-variables)
   - [Keep line length <= 120 characters](#keep-line-length--120-characters)
 - [Rules](#rules)
   - [Use helper rules and functions](#use-helper-rules-and-functions)
