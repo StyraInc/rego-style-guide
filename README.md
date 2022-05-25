@@ -772,7 +772,7 @@ first_a := i {
 }
 ```
 
-While the second form is valid, it is almost guaranteed to confuse developers coming from the most common programming
+While the first form is valid, it is almost guaranteed to confuse developers coming from the most common programming
 languages. Again, optimize for readability!
 
 ## Regex
