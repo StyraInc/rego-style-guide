@@ -158,16 +158,21 @@ Long lines are tedious to read. Keep line length at 120 characters or below.
 
 **Avoid**
 ```rego
+import future.keywords
+
 frontend_admin_users := [username | some user in input.users; "frontend" in user.domains; "admin" in user.roles; username := user.username]
 ```
 
 **Prefer**
 ```rego
+import future.keywords
+
 frontend_admin_users := [username |
     some user in input.users
     "frontend" in user.domains
     "admin" in user.roles
-    username := user.username]
+    username := user.username
+]
 ```
 
 ## Rules
@@ -179,6 +184,8 @@ more than a few simple expressions, consider splitting it into multiple rules wi
 
 **Avoid**
 ```rego
+import future.keywords
+
 allow {
     "developer" in input.user.roles
     input.request.method in {"GET", "HEAD"}
@@ -195,6 +202,8 @@ allow {
 **Prefer**
 
 ```rego
+import future.keywords
+
 allow {
     is_developer
     read_request
@@ -609,7 +618,7 @@ where you'll want to do both comparison and assignment to variables from the pat
 ```rego
 # Using unification - compact but clear
 router {
-	some user_id, podcast_id
+    some user_id, podcast_id
     ["users", user_id, "podcasts", podcast_id] = input.request.path
 
     # .. do something with user_id, podcast_id
@@ -617,7 +626,7 @@ router {
 
 # Using comparison + assignment - arguably messier
 router {
-	input.request_path[0] == "users"
+    input.request_path[0] == "users"
     input.request_path[2] == "podcasts"
 
     user_id := input.request_path[1]
@@ -728,6 +737,8 @@ on their arguments are easier to test standalone.
 
 **Avoid**
 ```rego
+import future.keywords
+
 # Depends on both `input` and `data`
 is_preferred_login_method(method) {
     preferred_login_methods := {login_method |
@@ -740,6 +751,8 @@ is_preferred_login_method(method) {
 
 **Prefer**
 ```rego
+import future.keywords
+
 # Depends only on function arguments
 is_preferred_login_method(method, user, all_login_methods) {
     preferred_login_methods := {login_method |
@@ -861,6 +874,8 @@ In some contexts, the source of data is obvious even when imported and/or rename
 to rename `input` in Terraform policies for example, either via `import` or a new top-level variable.
 
 ```rego
+import future.keywords
+
 import input as tfplan
 
 violations[message] {
