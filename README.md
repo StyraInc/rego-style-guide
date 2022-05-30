@@ -67,6 +67,23 @@ A good idea could be to run `opa fmt --write` on save, which can be configured i
 
 In order to not flood this guide with data, formatting conventions covered by `opa fmt` will not be included here.
 
+**Tip**: `opa fmt` uses tabs for indentation. By default, GitHub uses 8 spaces to display tabs, which is arguably a bit
+much. You can change this preference for your account in
+[https://github.com/settings/appearance](https://github.com/settings/appearance),
+or provide an [.editorconfig](https://editorconfig.org/) file in your policy repository, which will be used by GitHub
+(and other tools) to properly display your Rego files:
+
+```ini
+[*.rego]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+indent_style = tab
+indent_size = 4
+```
+
+Sadly, there doesn't seem to be a way to enforce this for code blocks displayed in markdown (`.md`) files.
+
 ### Use strict mode
 
 [Strict mode](https://www.openpolicyagent.org/docs/latest/strict/) provides extra checks for common mistakes like
