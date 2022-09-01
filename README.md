@@ -49,7 +49,7 @@ Rego is a declarative language, which in the best case means you express **what*
 should be retrieved. When authoring policy, do not try to be "smart" about assumed performance characteristics or
 optimizations. That's what OPA should worry about!
 
-Optimize for **readbility** and **obviousness**. Optimize for performance *only* if you've identified performance
+Optimize for **readability** and **obviousness**. Optimize for performance *only* if you've identified performance
 issues in your policy, and even if you do — making your policy more compact or "clever" almost never helps at addressing
 the problem at hand.
 
@@ -279,7 +279,7 @@ deny["User ID missing from input"] {
 }
 ```
 
-This is nice in that we'll get an even more granual message returned to the caller, but quickly becomes tedious when
+This is nice in that we'll get an even more granular message returned to the caller, but quickly becomes tedious when
 working with a large set of input data. To deal with this, a helper rule using _negation_ may be used.
 
 **Prefer**
