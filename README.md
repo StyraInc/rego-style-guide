@@ -38,6 +38,7 @@ and see the changelog for updates since your last visit.
 - [Regex](#regex)
   - [Use raw strings for regex patterns](#use-raw-strings-for-regex-patterns)
 - [Imports](#imports)
+  - [Use explicit imports for future keywords](#use-explicit-imports-for-future-keywords)
   - [Prefer importing modules over rules and functions](#prefer-importing-modules-over-rules-and-functions)
   - [Avoid importing `input`](#avoid-importing-input)
 
@@ -101,9 +102,12 @@ something useful, like in-line explanations, generated docs, etc.
 # Base package composing the decision from deny rules in sub-packages
 package main
 
+import future.keywords.contains
+import future.keywords.if
+
 # Aggregate deny rules from package(s) under `authorization` based
 # on first path component in input
-router[msg] {
+router contains msg if {
     data["authorization"][input.path[0]].deny[msg]
 }
 ```
@@ -114,11 +118,14 @@ router[msg] {
 # description: Base package composing the decision from deny rules in sub-packages
 package main
 
+import future.keywords.contains
+import future.keywords.if
+
 # METADATA
 # description: |
 #  Aggregate deny rules from package(s) under `authorization` based
 #  on first path component in input
-router[msg] {
+router contains msg if {
     data["authorization"][input.path[0]].deny[msg]
 }
 ```
@@ -150,16 +157,12 @@ The built-in functions use `snake_case` for naming — follow that convention fo
 
 **Avoid**
 ```rego
-userIsAdmin {
-    "admin" in input.user.roles
-}
+userIsAdmin if "admin" in input.user.roles
 ```
 
 **Prefer**
 ```rego
-user_is_admin {
-    "admin" in input.user.roles
-}
+user_is_admin if "admin" in input.user.roles
 ```
 
 **Notes / Exceptions**
@@ -175,15 +178,11 @@ Long lines are tedious to read. Keep line length at 120 characters or below.
 
 **Avoid**
 ```rego
-import future.keywords
-
 frontend_admin_users := [username | some user in input.users; "frontend" in user.domains; "admin" in user.roles; username := user.username]
 ```
 
 **Prefer**
 ```rego
-import future.keywords
-
 frontend_admin_users := [username |
     some user in input.users
     "frontend" in user.domains
@@ -201,15 +200,13 @@ more than a few simple expressions, consider splitting it into multiple rules wi
 
 **Avoid**
 ```rego
-import future.keywords
-
-allow {
+allow if {
     "developer" in input.user.roles
     input.request.method in {"GET", "HEAD"}
     startswith(input.request.path, "/docs")
 }
 
-allow {
+allow if {
     "developer" in input.user.roles
     input.request.method in {"GET", "HEAD"}
     startswith(input.request.path, "/api")
@@ -219,27 +216,21 @@ allow {
 **Prefer**
 
 ```rego
-import future.keywords
-
-allow {
+allow if {
     is_developer
     read_request
     startswith(input.request.path, "/docs")
 }
 
-allow {
+allow if {
     is_developer
     read_request
     startswith(input.request.path, "/api")
 }
 
-read_request {
-    input.request.method in {"GET", "HEAD"}
-}
+read_request if input.request.method in {"GET", "HEAD"}
 
-is_developer {
-    "developer" in input.user.roles
-}
+is_developer if "developer" in input.user.roles
 ```
 
 Additionally, helper rules and functions may be kept in (and imported from) separate modules, allowing you to build a
@@ -262,9 +253,7 @@ Consider for example this simple rule:
 ```rego
 authorized := count(deny) == 0
 
-deny["User is anonymous"] {
-    input.user_id == "anonymous"
-}
+deny contains "User is anonymous" if input.user_id == "anonymous"
 ```
 
 At first glance, it might seem obvious that evaluating the rule should add a violation to the set of messages if the
@@ -274,9 +263,7 @@ being added to the `deny` set — the rule allows someone without a `user_id`. W
 rule, checking only for its presence:
 
 ```rego
-deny["User ID missing from input"] {
-    not input.user_id
-}
+deny contains "User ID missing from input" if not input.user_id
 ```
 
 This is nice in that we'll get an even more granular message returned to the caller, but quickly becomes tedious when
@@ -286,13 +273,9 @@ working with a large set of input data. To deal with this, a helper rule using _
 ```rego
 authorized := count(deny) == 0
 
-deny["User is anonymous"] {
-    not authenticated_user
-}
+deny contains "User is anonymous" if not authenticated_user
 
-authenticated_user {
-    input.user_id != "anonymous"
-}
+authenticated_user if input.user_id != "anonymous"
 ```
 
 In the above case, the `authenticated_user` rule will fail **both** in the the undefined case, and if defined
@@ -311,9 +294,7 @@ queried individually.
 
 **Avoid**
 ```rego
-import future.keywords
-
-allow {
+allow if {
     input.request.method in {"GET", "HEAD"}
     input.request.path[0] == "credit_reports"
     input.user.name in {username |
@@ -331,15 +312,13 @@ allow {
 
 **Prefer**
 ```rego
-import future.keywords
-
-allow {
+allow if {
     input.request.method in {"GET", "HEAD"}
     input.request.path[0] == "credit_reports"
     input.user.name in mfa_authenticated_users
 }
 
-mfa_authenticated_users[username] {
+mfa_authenticated_users contains username if {
     # These should not count as MFA
     insecure_methods := {"email"}
 
@@ -368,7 +347,7 @@ single value (i.e. a complete rule) or a collection (a partial rule).
 get_first_name(user) := split(user.name, " ")[0]
 
 # Partial rule, so a set of users is to be expected
-list_developers[developer] {
+list_developers contains user if {
     some user in data.application.users
     user.type == "developer"
 }
@@ -380,7 +359,7 @@ list_developers[developer] {
 first_name(user) := split(user.name, " ")[0]
 
 # Partial rule, so a set of users is to be expected
-developers[developer] {
+list_developers contains user if {
     some user in data.application.users
     user.type == "developer"
 }
@@ -408,31 +387,21 @@ allow {
 
 **Prefer**
 ```rego
-import future.keywords
-
-allow {
-    "admin" in input.user.roles
-}
+allow if "admin" in input.user.roles
 ```
 
 **Avoid**
 ```rego
-deny["Only admin allowed"] {
-    not user_is_admin
-}
+deny contains "Only admin allowed" if not user_is_admin
 
-user_is_admin {
+user_is_admin if {
     "admin" == input.user.roles[_]
 }
 ```
 
 **Prefer**
 ```rego
-import future.keywords
-
-deny["Only admin allowed"] {
-    not "admin" in input.user.roles
-}
+deny contains "Only admin allowed" if not "admin" in input.user.roles
 ```
 
 ### Prefer `some .. in` for iteration
@@ -440,8 +409,9 @@ deny["Only admin allowed"] {
 Using the `some` .. `in` construct for iteration removes ambiguity around iteration vs. membership checks, and is
 generally more pleasant to read.
 
+**Avoid**
 ```rego
-my_rule {
+my_rule if {
     # Are we iterating users over a partial "other_rule" here,
     # or checking if the set contains a user defined elsewhere?
     other_rule[user]
@@ -454,14 +424,14 @@ granted when reading code from someone else.
 **Avoid**
 ```rego
 # Iterating over array
-internal_hosts[hostname] {
+internal_hosts contains hostname if {
     host := data.network.hosts[_]
     host.internal == true
     hostname := host.name
 }
 
 # Iterating over object
-public_endpoints[endpoint] {
+public_endpoints contains endpoint if {
     some endpoint
     attributes := endpoints[endpoint]
     attributes.public
@@ -470,16 +440,14 @@ public_endpoints[endpoint] {
 
 **Prefer**
 ```rego
-import future.keywords
-
-internal_hosts[hostname] {
+internal_hosts contains hostname if {
     some host in data.network.hosts
     host.internal == true
     hostname := host.name
 }
 
 # Iterating over object
-public_endpoints[endpoint] {
+public_endpoints contains endpoint if {
     some endpoint, attributes in endpoints
     attributes.public
 }
@@ -512,14 +480,10 @@ comprehension.
 
 **Avoid**
 ```rego
-import future.keywords
+# Negate result of _any_ match
+allow if not any_old_registry
 
-allow {
-    # Negate result of _any_ match
-    not any_old_registry
-}
-
-any_old_registry {
+any_old_registry if {
     some container in input.request.object.spec.containers
     startswith(container.image, "old.docker.registry/")
 }
@@ -527,9 +491,7 @@ any_old_registry {
 
 **Prefer**
 ```rego
-import future.keywords
-
-allow {
+allow if {
     every container in input.request.object.spec.containers {
         not startswith(container.image, "old.docker.registry/")
     }
@@ -540,7 +502,7 @@ allow {
 ```rego
 words := ["always", "arbitrary", "air", "brand", "asphalt"]
 
-all_starts_with_a {
+all_starts_with_a if {
     starts_with_a := [word |
         some word in words
         startswith(word, "a")
@@ -551,11 +513,9 @@ all_starts_with_a {
 
 **Prefer**
 ```rego
-import future.keywords
-
 words := ["always", "arbitrary", "air", "brand", "asphalt"]
 
-all_starts_with_a {
+all_starts_with_a if {
     every word in words {
         startswith(word, "a")
     }
@@ -580,7 +540,7 @@ associated with unification.
 # Top level assignment using unification operator
 roles = input.user.roles
 
-allow {
+allow if {
     # Unification operator - used for assignment to `username` variable or for
     # comparing to a `username` variable or rule defined elsewhere? Who knows.
     username = input.user.name
@@ -588,12 +548,12 @@ allow {
     # ...
 }
 
-allow {
+allow if {
     # Unification operator used for comparison
     input.request.method = "GET"
 }
 
-allow {
+allow if {
     some user
     input.request.path = ["users", user]
     input.request.user == user
@@ -605,7 +565,7 @@ allow {
 # Top level assignment using assignment operator
 roles := input.user.roles
 
-allow {
+allow if {
     # Assignment operator used for assignment - no ambiguity around
     # intent, or variable scope
     username := input.user.name
@@ -613,12 +573,12 @@ allow {
     # ... do something with username
 }
 
-allow {
+allow if {
     # Comparison operator used for comparison
     input.request.method == "GET"
 }
 
-allow {
+allow if {
     input.request.path == ["users", input.request.user]
 }
 ```
@@ -664,29 +624,27 @@ in a rule, and introduces ambiguities around scope.
 
 **Avoid**
 ```rego
-messages[message] {
+messages contains message if {
     message := input.topics[topic].body
 }
 ```
 
 **Prefer**
 ```rego
-messages[message] {
+messages contains message if {
     some topic
     message := input.topics[topic].body
 }
 
 # Alternatively
-import future.keywords
-
-messages[message] {
+messages contains message if {
     some topic in input.topics
     message := topic.body
 }
 
 # or
 
-messages[message] {
+messages contains message if {
     message := input.topics[_].body
 }
 ```
@@ -706,12 +664,10 @@ For any applicable sequence of values, sets have the following benefits over arr
 
 **Avoid**
 ```rego
-import future.keywords
-
 required_roles := ["accountant", "reports-writer"]
 provided_roles := [role | some role in input.user.roles]
 
-allow {
+allow if {
     every required_role in required_roles {
         required_role in provided_roles
     }
@@ -720,12 +676,10 @@ allow {
 
 **Prefer**
 ```rego
-import future.keywords
-
 required_roles := {"accountant", "reports-writer"}
 provided_roles := {role | some role in input.user.roles}
 
-allow {
+allow if {
     every required_role in required_roles {
         required_role in provided_roles
     }
@@ -735,7 +689,7 @@ allow {
 **Prefer**
 ```rego
 # Alternatively, use set intersection
-allow {
+allow if {
     required_roles & provided_roles == required_roles
 }
 ```
@@ -754,10 +708,8 @@ on their arguments are easier to test standalone.
 
 **Avoid**
 ```rego
-import future.keywords
-
 # Depends on both `input` and `data`
-is_preferred_login_method(method) {
+is_preferred_login_method(method) if {
     preferred_login_methods := {login_method |
         some login_method in data.authentication.all_login_methods
         login_method in input.user.login_methods
@@ -768,10 +720,8 @@ is_preferred_login_method(method) {
 
 **Prefer**
 ```rego
-import future.keywords
-
 # Depends only on function arguments
-is_preferred_login_method(method, user, all_login_methods) {
+is_preferred_login_method(method, user, all_login_methods) if {
     preferred_login_methods := {login_method |
         some login_method in all_login_methods
         login_method in user.login_methods
@@ -790,14 +740,14 @@ expressions are thus equivalent:
 
 **Avoid**
 ```rego
-first_a := i {
+first_a := i if {
     indexof("answer", "a", i)
 }
 ```
 
 **Prefer**
 ```rego
-first_a := i {
+first_a := i if {
     i := indexof("answer", "a")
 }
 ```
@@ -814,19 +764,52 @@ you to avoid having to escape special characters like `\` in your regex patterns
 
 **Avoid**
 ```rego
-all_digits {
+all_digits if {
     regex.match("[\\d]+", "12345")
 }
 ```
 
 **Prefer**
 ```rego
-all_digits {
+all_digits if {
     regex.match(`[\d]+`, "12345")
 }
 ```
 
 ## Imports
+
+### Use explicit imports for future keywords
+
+In order to evolve the Rego language without breaking existing policies, many new features require importing
+["future" keywords](https://www.openpolicyagent.org/docs/latest/policy-language/#future-keywords), like `contains`,
+`every`, `if` and `in`. While it might seem convenient to use the "catch-all" form of `import future.keywords` to
+import all of the future keywords, this construct risks breaking your policies when new keywords are introduced, and
+their names happen to collide with names you've used for variables or rules.
+
+**Avoid**
+```rego
+import future.keywords
+
+severe_violations contains violation if {
+    some violation in input.violations
+    violation.severity > 5
+}
+```
+
+**Prefer**
+```rego
+import future.keywords.contains
+import future.keywords.if
+import future.keywords.in
+
+severe_violations contains violation if {
+    some violation in input.violations
+    violation.severity > 5
+}
+```
+
+**Tip**: Importing the `every` keyword implicitly imports `in` as well, as it is required by the `every` construct.
+Leaving out the import of `in` when `every` is imported is considered okay.
 
 ### Prefer importing modules over rules and functions
 
@@ -837,18 +820,14 @@ obvious where the rule or function was declared. Additionally, well-named packag
 ```rego
 import data.user.is_admin
 
-allow {
-    is_admin
-}
+allow if is_admin
 ```
 
 **Prefer**
 ```rego
 import data.user
 
-allow {
-    user.is_admin
-}
+allow if user.is_admin
 ```
 
 ### Avoid importing `input`
@@ -863,7 +842,7 @@ import input.request.context.user
 
 # ... many lines of code later
 
-fin_dept {
+fin_dept if {
     # where does "user" come from?
     contains(user.department, "finance")
 }
@@ -871,14 +850,14 @@ fin_dept {
 
 **Prefer**
 ```rego
-fin_dept {
+fin_dept if {
     contains(input.request.context.user.department, "finance")
 }
 ```
 
 **Prefer**
 ```rego
-fin_dept {
+fin_dept if {
     # Alternatively, assign an intermediate variable close to where it's referenced
     user := input.request.context.user
     contains(user.department, "finance")
@@ -891,11 +870,9 @@ In some contexts, the source of data is obvious even when imported and/or rename
 to rename `input` in Terraform policies for example, either via `import` or a new top-level variable.
 
 ```rego
-import future.keywords
-
 import input as tfplan
 
-violations[message] {
+violations contains message if {
     # still obvious where "tfplan" comes from, perhaps even more so — this is generally acceptable
     some change in tfplan.resource_changes
     # ...
