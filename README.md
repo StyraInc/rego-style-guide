@@ -39,7 +39,7 @@ and see the changelog for updates since your last visit.
   - [Use raw strings for regex patterns](#use-raw-strings-for-regex-patterns)
 - [Imports](#imports)
   - [Use explicit imports for future keywords](#use-explicit-imports-for-future-keywords)
-  - [Prefer importing modules over rules and functions](#prefer-importing-modules-over-rules-and-functions)
+  - [Prefer importing packages over rules and functions](#prefer-importing-packages-over-rules-and-functions)
   - [Avoid importing `input`](#avoid-importing-input)
 
 ## General Advice
@@ -811,9 +811,9 @@ severe_violations contains violation if {
 **Tip**: Importing the `every` keyword implicitly imports `in` as well, as it is required by the `every` construct.
 Leaving out the import of `in` when `every` is imported is considered okay.
 
-### Prefer importing modules over rules and functions
+### Prefer importing packages over rules and functions
 
-Importing modules rather than specific rules and functions allows you to reference them by the module name, making it
+Importing packages rather than specific rules and functions allows you to reference them by the package name, making it
 obvious where the rule or function was declared. Additionally, well-named packages help provide context to assertions.
 
 **Avoid**
@@ -834,7 +834,7 @@ allow if user.is_admin
 
 While importing attributes from the global `input` variable might eliminate some levels of nesting, it makes the origin
 of the attribute(s) less apparent. Clearly differentiating `input` and `data` from values, functions, and rules
-defined inside of the same module helps in making things _obvious_, and few things beat obviousness!
+defined inside of the same package helps in making things _obvious_, and few things beat obviousness!
 
 **Avoid**
 ```rego
