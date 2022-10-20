@@ -359,7 +359,7 @@ list_developers contains user if {
 first_name(user) := split(user.name, " ")[0]
 
 # Partial rule, so a set of users is to be expected
-list_developers contains user if {
+developers contains user if {
     some user in data.application.users
     user.type == "developer"
 }
