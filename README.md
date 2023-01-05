@@ -370,6 +370,28 @@ developers contains user if {
 Using `is_`, or `has_` for boolean helper functions, like `is_admin(user)` may be easier to comprehend than
 `admin(user)`.
 
+### Prefer unconditional assignment in rule head over rule body
+
+Rules that return values unconditionally should place the assignment directly in the rule head, as doing so
+in the rule body adds unnecessary noise.
+
+**Avoid**
+```rego
+full_name := name {
+    name := concat(", ", [input.first_name, input.last_name])
+}
+
+divide_by_ten(x) := y {
+    y := x / 10
+}
+```
+**Prefer**
+```rego
+full_name := concat(", ", [input.first_name, input.last_name])
+
+divide_by_ten(x) := x / 10
+```
+
 ## Variables and Data Types
 
 ### Use `in` to check for membership
