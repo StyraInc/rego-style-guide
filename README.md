@@ -15,7 +15,6 @@ and see the changelog for updates since your last visit.
 <!-- toc -->
 
 * [General Advice](#general-advice)
-* 
   * [Optimize for readability, not performance](#optimize-for-readability-not-performance)
   * [Use `opa fmt`](#use-opa-fmt)
   * [Use strict mode](#use-strict-mode)
