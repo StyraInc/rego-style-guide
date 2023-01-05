@@ -25,6 +25,7 @@ and see the changelog for updates since your last visit.
   - [Use negation to handle undefined](#use-negation-to-handle-undefined)
   - [Consider partial helper rules over comprehensions in rule bodies](#consider-partial-helper-rules-over-comprehensions-in-rule-bodies)
   - [Avoid prefixing rules and functions with `get_` or `list_`](#avoid-prefixing-rules-and-functions-with-get_-or-list_)
+  - [Prefer unconditional assignment in rule head over rule body](#prefer-unconditional-assignment-in-rule-head-over-rule-body)
 - [Variables and Data Types](#variables-and-data-types)
   - [Use `in` to check for membership](#use-in-to-check-for-membership)
   - [Prefer `some .. in` for iteration](#prefer-some--in-for-iteration)
