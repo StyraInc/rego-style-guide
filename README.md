@@ -292,11 +292,6 @@ In the above case, the `authenticated_user` rule will fail **both** in the the u
 but equal to "anonymous". Since we negate the result of the helper rule in the `deny` rule, we'll have both
 cases covered.
 
-**Notes / Exceptions**
-
-* If you have a more complex input data document, you might be better off using Rego's Type Checking functionality to 
-  validate input. This is documented [here](https://www.openpolicyagent.org/docs/latest/schemas/#schema-annotations).
-
 #### Related Resources
 - [OPA AWS CloudFormation Hook Tutorial](https://www.openpolicyagent.org/docs/latest/aws-cloudformation-hooks/)
 
