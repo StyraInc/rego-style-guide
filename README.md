@@ -2,7 +2,7 @@
 
 The purpose of this style guide is to provide a collection of recommendations and best practices for authoring
 [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/).
-From Styra, the founders of [Open Policy Agent](https://www.openpolicyagent.org) (OPA),
+From [Styra](https://www.styra.com), the founders of [Open Policy Agent](https://www.openpolicyagent.org) (OPA),
 and some of the most experienced members of the community,
 we hope to share lessons learnt from authoring and reviewing hundreds of thousands of lines of Rego over the years.
 
