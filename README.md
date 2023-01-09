@@ -681,15 +681,6 @@ messages contains message if {
 }
 ```
 
-**Notes / Exceptions**
-
-You might want to use an undeclared variable for an index in a simple comprehension, e.g.:
-
-```rego
-a := ["Apple", "Banana", "Carrot"]
-b := {x | x = a[i]; i % 2 == 0 }
-```
-
 ### Prefer sets over arrays (where applicable)
 
 For any *unordered* sequence of *unique* values, prefer to use
