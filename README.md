@@ -104,39 +104,59 @@ pipeline.
 ### Use metadata annotations
 
 Favor [metadata annotations](https://www.openpolicyagent.org/docs/latest/annotations/) over regular comments.
+
 Metadata annotations allow external tools and editors to parse their contents, potentially leveraging them for
 something useful, like in-line explanations, generated docs, etc.
 
+Annotations are also a good way to de-duplicate information such as documentation links, contact emails
+and error codes where explanations are returned as part of the result.
+
 **Avoid**
 ```rego
-# Base package composing the decision from deny rules in sub-packages
-package main
+# Example package with documentation
+package example
 
 import future.keywords.contains
 import future.keywords.if
 
-# Aggregate deny rules from package(s) under `authorization` based
-# on first path component in input
-router contains msg if {
-    data["authorization"][input.path[0]].deny[msg]
+# E123: Deny non admin users.
+# Only admin users are allowed to access these resources, see https://docs.example.com/policy/rule/E123
+deny contains {
+	"code": 401,
+	"message": "Unauthorized due to policy rule (E123, https://docs.example.com/policy/rule/E123)",
+} if {
+	input.admin == false
 }
 ```
 
 **Prefer**
 ```rego
 # METADATA
-# description: Base package composing the decision from deny rules in sub-packages
-package main
+# title: Example
+# description: Example package with documentation
+package example
 
 import future.keywords.contains
 import future.keywords.if
 
 # METADATA
-# description: |
-#  Aggregate deny rules from package(s) under `authorization` based
-#  on first path component in input
-router contains msg if {
-    data["authorization"][input.path[0]].deny[msg]
+# title: Deny non admin users
+# description: Only admin users are allowed to access these resources
+# related_resources:
+# - https://docs.example.com/policy/rule/E123
+# custom:
+#   code: 401
+#   error_id: E123  
+deny contains {
+	"code": metadata.custom.code,
+	"message": sprintf("Unauthorized due to policy rule (%s, %s)", [
+		metadata.custom.error_id,
+		concat(",", [ref | ref := metadata.related_resources[_].ref]),
+	]),
+} if {
+	input.admin == false
+
+	metadata := rego.metadata.rule()
 }
 ```
 
