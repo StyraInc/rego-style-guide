@@ -1,7 +1,9 @@
 # Rego Style Guide
 
-The purpose of this style guide is to provide a collection of recommendations and best practices for authoring Rego.
-From Styra, the founders of Open Policy Agent (OPA), and some of the most experienced members of the community,
+The purpose of this style guide is to provide a collection of recommendations and best practices for authoring
+[Rego](https://www.openpolicyagent.org/docs/latest/policy-language/).
+From [Styra](https://www.styra.com), the founders of [Open Policy Agent](https://www.openpolicyagent.org) (OPA),
+and some of the most experienced members of the community,
 we hope to share lessons learnt from authoring and reviewing hundreds of thousands of lines of Rego over the years.
 
 With new features, language constructs, and other improvements continuously finding their way into OPA, we aim to keep
@@ -78,7 +80,7 @@ In order to not flood this guide with data, formatting conventions covered by `o
 
 **Tip**: `opa fmt` uses tabs for indentation. By default, GitHub uses 8 spaces to display tabs, which is arguably a bit
 much. You can change this preference for your account in
-[https://github.com/settings/appearance](https://github.com/settings/appearance),
+[github.com/settings/appearance](https://github.com/settings/appearance),
 or provide an [.editorconfig](https://editorconfig.org/) file in your policy repository, which will be used by GitHub
 (and other tools) to properly display your Rego files:
 
@@ -175,7 +177,7 @@ user_is_admin if "admin" in input.user.roles
 
 **Notes / Exceptions**
 
-For many policy types, you might not control the format of the `input` data — if the domain of a policy (e.g. Envoy)
+In many cases, you might not control the format of the `input` data — if the domain of a policy (e.g. Envoy)
 mandates a different style, making an exception might seem reasonable. Adapting policy format after `input` is however
 prone to inconsistencies, as you'll likely end up mixing different styles in the same policy (due to imports of common
 code, etc).
