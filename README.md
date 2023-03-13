@@ -49,6 +49,7 @@ and see the changelog for updates since your last visit.
   * [Prefer importing packages over rules and functions](#prefer-importing-packages-over-rules-and-functions)
   * [Avoid importing `input`](#avoid-importing-input)
 * [Contributing](#contributing)
+* [Community](#community)
 
 <!-- tocstop -->
 
@@ -146,7 +147,7 @@ import future.keywords.if
 # - https://docs.example.com/policy/rule/E123
 # custom:
 #   code: 401
-#   error_id: E123  
+#   error_id: E123
 deny contains {
 	"code": metadata.custom.code,
 	"message": sprintf("Unauthorized due to policy rule (%s, %s)", [
@@ -940,3 +941,7 @@ we welcome contributions from any of its members. Since most of the topics in a 
 discussion, please open an issue, and allow some time for people to comment, before opening a PR.
 
 If you'd like to add or remove items for your own company, team or project, forking this repo is highly encouraged!
+
+## Community
+
+For questions, discussions and announcements related to Styra products, services and open source projects, please join the Styra community on [Slack](https://join.slack.com/t/styracommunity/shared_invite/zt-1p81qz8g4-t2OLKbvw0J5ibdcNc62~6Q)!
