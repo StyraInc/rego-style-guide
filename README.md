@@ -40,7 +40,7 @@ and see the changelog for updates since your last visit.
   * [Don't use undeclared variables](#dont-use-undeclared-variables)
   * [Prefer sets over arrays (where applicable)](#prefer-sets-over-arrays-where-applicable)
 * [Functions](#functions)
-  * [Prefer using arguments over `input` and `data`](#prefer-using-arguments-over-input-and-data)
+  * [Prefer using arguments over `input`, `data` or rule references](#prefer-using-arguments-over-input-data-or-rule-references)
   * [Avoid using the last argument for the return value](#avoid-using-the-last-argument-for-the-return-value)
 * [Regex](#regex)
   * [Use raw strings for regex patterns](#use-raw-strings-for-regex-patterns)
@@ -752,12 +752,12 @@ allow if {
 
 ## Functions
 
-### Prefer using arguments over `input` and `data`
+### Prefer using arguments over `input`, `data` or rule references
 
 What separates functions from rules is that they accept _arguments_. While a function too may reference anything from
-`input` and `data`, these references create dependencies that aren't obvious simply by checking the function signature,
-and it makes it harder to reuse that function in other contexts. Additionally, functions that only depend
-on their arguments are easier to test standalone.
+`input`, `data` or other rules declared in a policy, these references create dependencies that aren't obvious simply by
+checking the function signature, and it makes it harder to reuse that function in other contexts. Additionally,
+functions that only depend on their arguments are easier to test standalone.
 
 **Avoid**
 ```rego
