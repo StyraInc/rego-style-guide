@@ -10,6 +10,12 @@ With new features, language constructs, and other improvements continuously find
 this style guide a reflection of what we consider current best practices. Make sure to check back every once in a while,
 and see the changelog for updates since your last visit.
 
+### Regal
+
+Inspired by this style guide, [Regal](https://github.com/StyraInc/regal) is a new linter for Rego that allows you
+to enforce many of the recommendations in this guide, as well as identifying issues, bugs and potential problems in your
+Rego policies. If you enjoy this style guide, make sure to check it out!
+
 ## Contents
 
 <!-- run make toc to update -->
