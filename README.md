@@ -1,5 +1,8 @@
 # Rego Style Guide
 
+This repository contains source code for the
+[Rego Style Guide](https://docs.styra.com/opa/rego-style-guide).
+
 The purpose of this style guide is to provide a collection of recommendations
 and best practices for authoring
 [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/).
@@ -12,9 +15,6 @@ thousands of lines of Rego over the years.
 > [!NOTE]
 > You might also be interested in checking out [Regal](https://docs.styra.com/regal),
 > the new linter for Rego from Styra.
-
-This repository contains source code for the
-[Rego Style Guide](https://docs.styra.com/opa/rego-style-guide).
 
 If you are interested in suggesting changes to the guide's content,
 please feel free to raise an issue or PR on this repo. The document
