@@ -102,6 +102,11 @@ indent_size = 4
 
 Sadly, there doesn't seem to be a way to enforce this for code blocks displayed in markdown (`.md`) files.
 
+:::tip
+You can lint for this recommendation using the [`opa-fmt`](https://docs.styra.com/regal/rules/style/prefer-snake-case)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
+
 ### Use strict mode
 
 [Strict mode](https://www.openpolicyagent.org/docs/latest/strict/) provides extra checks for common mistakes like
@@ -209,6 +214,12 @@ mandates a different style, making an exception might seem reasonable. Adapting 
 prone to inconsistencies, as you'll likely end up mixing different styles in the same policy (due to imports of common
 code, etc).
 
+:::tip
+You can lint for this recommendation using the [`prefer-snake-case`](https://docs.styra.com/regal/rules/style/prefer-snake-case)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
+
+
 ### Keep line length <= 120 characters
 
 Long lines are tedious to read. Keep line length at 120 characters or below.
@@ -227,6 +238,11 @@ frontend_admin_users := [username |
     username := user.username
 ]
 ```
+
+:::tip
+You can lint for this recommendation using the [`line-length`](https://docs.styra.com/regal/rules/style/line-length)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
 
 ## Rules
 
@@ -407,6 +423,11 @@ developers contains user if {
 Using `is_`, or `has_` for boolean helper functions, like `is_admin(user)` may be easier to comprehend than
 `admin(user)`.
 
+:::tip
+You can lint for this recommendation using the [`avoid-get-and-list-prefix`](https://docs.styra.com/regal/rules/style/avoid-get-and-list-prefix)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
+
 ### Prefer unconditional assignment in rule head over rule body
 
 Rules that return values unconditionally should place the assignment directly in the rule head, as doing so
@@ -428,6 +449,11 @@ full_name := concat(", ", [input.first_name, input.last_name])
 
 divide_by_ten(x) := x / 10
 ```
+
+:::tip
+You can lint for this recommendation using the [`unconditional-assignment`](https://docs.styra.com/regal/rules/style/unconditional-assignment)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
 
 ## Variables and Data Types
 
@@ -462,6 +488,11 @@ user_is_admin if {
 ```rego
 deny contains "Only admin allowed" if not "admin" in input.user.roles
 ```
+
+:::tip
+You can lint for this recommendation using the [`use-in-operator`](https://docs.styra.com/regal/rules/idiomatic/use-in-operator)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
 
 ### Prefer `some .. in` for iteration
 
@@ -530,6 +561,11 @@ all_hostnames := [hostname |
     hostname := server.hostname
 ]
 ```
+
+:::tip
+You can lint for this recommendation using the [`prefer-some-in-iteration`](https://docs.styra.com/regal/rules/style/prefer-some-in-iteration)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
 
 ### Use `every` to express FOR ALL
 
@@ -676,6 +712,11 @@ router {
 - [Strict-mode to phase-out the "single =" operator](https://github.com/open-policy-agent/opa/issues/4688)
 - [OPA fmt 2.0](https://github.com/open-policy-agent/opa/issues/4508)
 
+:::tip
+You can lint for this recommendation using the [`use-assignment-operator`](https://docs.styra.com/regal/rules/style/use-assignment-operator)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
+
 ### Don't use undeclared variables
 
 Using undeclared variables (i.e. not declared using `some` or `:=`) makes it harder to understand what's going on
@@ -707,6 +748,11 @@ messages contains message if {
     message := input.topics[_].body
 }
 ```
+
+:::tip
+You can lint for this recommendation using the [`use-some-for-output-vars`](https://docs.styra.com/regal/rules/idiomatic/use-some-for-output-vars)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
 
 ### Prefer sets over arrays (where applicable)
 
@@ -814,6 +860,11 @@ first_a := i if {
 While the first form is valid, it is almost guaranteed to confuse developers coming from the most common programming
 languages. Again, optimize for readability!
 
+:::tip
+You can lint for this recommendation using the [`function-arg-return`](https://docs.styra.com/regal/rules/style/function-arg-return)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
+
 ## Regex
 
 ### Use raw strings for regex patterns
@@ -834,6 +885,11 @@ all_digits if {
     regex.match(`[\d]+`, "12345")
 }
 ```
+
+:::tip
+You can lint for this recommendation using the [`non-raw-regex-pattern`](https://docs.styra.com/regal/rules/idiomatic/non-raw-regex-pattern)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
 
 ## Imports
 
@@ -870,6 +926,11 @@ severe_violations contains violation if {
 **Tip**: Importing the `every` keyword implicitly imports `in` as well, as it is required by the `every` construct.
 Leaving out the import of `in` when `every` is imported is considered okay.
 
+:::tip
+You can lint for this recommendation using the [`implicit-future-keywords`](https://docs.styra.com/regal/rules/imports/implicit-future-keywords)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
+
 ### Prefer importing packages over rules and functions
 
 Importing packages rather than specific rules and functions allows you to reference them by the package name, making it
@@ -887,7 +948,12 @@ allow if is_admin
 import data.user
 
 allow if user.is_admin
-```
+``` 
+
+:::tip
+You can lint for this recommendation using the [`prefer-package-imports`](https://docs.styra.com/regal/rules/imports/prefer-package-imports)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
 
 ### Avoid importing `input`
 
@@ -937,6 +1003,11 @@ violations contains message if {
     # ...
 }
 ```
+
+:::tip
+You can lint for this recommendation using the [`avoid-importing-input`](https://docs.styra.com/regal/rules/imports/avoid-importing-input)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
 
 ---
 
