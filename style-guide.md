@@ -103,7 +103,7 @@ indent_size = 4
 Sadly, there doesn't seem to be a way to enforce this for code blocks displayed in markdown (`.md`) files.
 
 :::tip
-You can lint for this recommendation using the [`opa-fmt`](https://docs.styra.com/regal/rules/style/prefer-snake-case)
+You can lint for this recommendation using the [`opa-fmt`](https://docs.styra.com/regal/rules/style/opa-fmt)
 Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
 :::
 
