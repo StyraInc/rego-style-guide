@@ -4,5 +4,5 @@ deps:
 
 PHONY: toc
 toc: deps
-	markdown-toc -i README.md --bullets="*" --maxdepth=3
+	markdown-toc -i style-guide.md --bullets="*" --maxdepth=3
 
