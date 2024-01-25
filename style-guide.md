@@ -31,7 +31,7 @@ Rego policies. If you enjoy this style guide, make sure to check it out!
   * [Consider using JSON schemas for type checking](#consider-using-json-schemas-for-type-checking)
 * [Style](#style)
   * [Prefer snake_case for rule names and variables](#prefer-snake_case-for-rule-names-and-variables)
-  * [Keep line length <= 120 characters](#keep-line-length--120-characters)
+  * [Keep line length `<=` 120 characters](#keep-line-length--120-characters)
 * [Rules](#rules)
   * [Use helper rules and functions](#use-helper-rules-and-functions)
   * [Use negation to handle undefined](#use-negation-to-handle-undefined)
@@ -220,7 +220,7 @@ Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/reg
 :::
 
 
-### Keep line length <= 120 characters
+### Keep line length `<=` 120 characters
 
 Long lines are tedious to read. Keep line length at 120 characters or below.
 
