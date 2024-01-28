@@ -177,7 +177,7 @@ deny contains {
 Use regular comments inside of rule bodies, or for packages and rules you consider "internal".
 
 #### Related Resources
-- [Annotations](https://www.openpolicyagent.org/docs/latest/annotations/)
+- [Annotations](https://www.openpolicyagent.org/docs/latest/policy-language/#metadata)
 
 ### Get to know the built-in functions
 
