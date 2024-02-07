@@ -1,0 +1,32 @@
+# this workflow is used to update the content at docs.styra.com
+# when it changes in this repo.
+name: Update Docs
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  update-docs:
+    name: Update Docs
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Save version
+        run: |
+          mkdir -p versions
+          echo "${{ github.sha }}" > versions/rego-style-guide
+
+      - name: Update docs
+        uses: leigholiver/commit-with-deploy-key@9562ffd1c0965c6d4f264e2555a569bd33ac7d05
+        with:
+          source: versions
+          destination_folder: versions
+          destination_repo: StyraInc/docs
+          deploy_key: ${{ secrets.STYRA_DOCS_DEPLOY_KEY }}
