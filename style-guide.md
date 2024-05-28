@@ -31,6 +31,7 @@ Rego policies. If you enjoy this style guide, make sure to check it out!
   * [Consider using JSON schemas for type checking](#consider-using-json-schemas-for-type-checking)
 * [Style](#style)
   * [Prefer snake_case for rule names and variables](#prefer-snake_case-for-rule-names-and-variables)
+  * [Optionally, use leading underscore for rules intended for internal use](#optionally-use-leading-underscore-for-rules-intended-for-internal-use)
   * [Keep line length `<=` 120 characters](#keep-line-length--120-characters)
 * [Rules](#rules)
   * [Use helper rules and functions](#use-helper-rules-and-functions)
@@ -51,9 +52,10 @@ Rego policies. If you enjoy this style guide, make sure to check it out!
 * [Regex](#regex)
   * [Use raw strings for regex patterns](#use-raw-strings-for-regex-patterns)
 * [Imports](#imports)
-  * [Use explicit imports for future keywords](#use-explicit-imports-for-future-keywords)
   * [Prefer importing packages over rules and functions](#prefer-importing-packages-over-rules-and-functions)
   * [Avoid importing `input`](#avoid-importing-input)
+* [Older Advice](#older-advice)
+  * [Use explicit imports for future keywords](#use-explicit-imports-for-future-keywords)
 * [Contributing](#contributing)
 * [Community](#community)
 
@@ -219,6 +221,34 @@ You can lint for this recommendation using the [`prefer-snake-case`](https://doc
 Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
 :::
 
+### Optionally, use leading underscore for rules intended for internal use
+
+While OPA doesn't have "private" rules or functions, a pretty common convention that we've seen in the community is to
+use a leading underscore for rules and functions that are intended to be internal to the package that they are in:
+
+```rego
+developers contains user if {
+    some user in input.users
+    _is_developer(user)
+}
+
+_is_developer(user) if {
+    # some conditions
+}
+
+_is_developer(user) if {
+    # some other conditions
+}
+```
+
+While an `is_developer` function may seem like a good candidate for reuse, it could easily be the case that this should
+be considered to what **this** package considers a developer, and not necessarily a universal truth. Using a leading
+underscore to denote this is a good way to communicate this intent, but there are also other ways to do this, like
+agreed upon naming conventions, or using custom metadata annotation attributes.
+
+One benefit of sticking to the leading underscore convention is that tools like [Regal](https://docs.styra.com/regal),
+and the language server for Rego that it provides, may use this information to provide better suggestions, like not
+adding references to these rules and functions from other packages.
 
 ### Keep line length `<=` 120 characters
 
@@ -893,44 +923,6 @@ Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/reg
 
 ## Imports
 
-### Use explicit imports for future keywords
-
-In order to evolve the Rego language without breaking existing policies, many new features require importing
-["future" keywords](https://www.openpolicyagent.org/docs/latest/policy-language/#future-keywords), like `contains`,
-`every`, `if` and `in`. While it might seem convenient to use the "catch-all" form of `import future.keywords` to
-import all of the future keywords, this construct risks breaking your policies when new keywords are introduced, and
-their names happen to collide with names you've used for variables or rules.
-
-**Avoid**
-```rego
-import future.keywords
-
-severe_violations contains violation if {
-    some violation in input.violations
-    violation.severity > 5
-}
-```
-
-**Prefer**
-```rego
-import future.keywords.contains
-import future.keywords.if
-import future.keywords.in
-
-severe_violations contains violation if {
-    some violation in input.violations
-    violation.severity > 5
-}
-```
-
-**Tip**: Importing the `every` keyword implicitly imports `in` as well, as it is required by the `every` construct.
-Leaving out the import of `in` when `every` is imported is considered okay.
-
-:::tip
-You can lint for this recommendation using the [`implicit-future-keywords`](https://docs.styra.com/regal/rules/imports/implicit-future-keywords)
-Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
-:::
-
 ### Prefer importing packages over rules and functions
 
 Importing packages rather than specific rules and functions allows you to reference them by the package name, making it
@@ -948,7 +940,7 @@ allow if is_admin
 import data.user
 
 allow if user.is_admin
-``` 
+```
 
 :::tip
 You can lint for this recommendation using the [`prefer-package-imports`](https://docs.styra.com/regal/rules/imports/prefer-package-imports)
@@ -1006,6 +998,51 @@ violations contains message if {
 
 :::tip
 You can lint for this recommendation using the [`avoid-importing-input`](https://docs.styra.com/regal/rules/imports/avoid-importing-input)
+Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
+:::
+
+## Older Advice
+
+Advice placed here was valid at the time, but has since been replaced by new recommendations. Kept here for the sake
+of completeness, and to provide context for older policies.
+
+### Use explicit imports for future keywords
+
+**With the introduction of the `import rego.v1` construct in OPA v0.59.0, this is no longer needed**
+
+In order to evolve the Rego language without breaking existing policies, many new features require importing
+["future" keywords](https://www.openpolicyagent.org/docs/latest/policy-language/#future-keywords), like `contains`,
+`every`, `if` and `in`. While it might seem convenient to use the "catch-all" form of `import future.keywords` to
+import all of the future keywords, this construct risks breaking your policies when new keywords are introduced, and
+their names happen to collide with names you've used for variables or rules.
+
+**Avoid**
+```rego
+import future.keywords
+
+severe_violations contains violation if {
+    some violation in input.violations
+    violation.severity > 5
+}
+```
+
+**Prefer**
+```rego
+import future.keywords.contains
+import future.keywords.if
+import future.keywords.in
+
+severe_violations contains violation if {
+    some violation in input.violations
+    violation.severity > 5
+}
+```
+
+**Tip**: Importing the `every` keyword implicitly imports `in` as well, as it is required by the `every` construct.
+Leaving out the import of `in` when `every` is imported is considered okay.
+
+:::tip
+You can lint for this recommendation using the [`implicit-future-keywords`](https://docs.styra.com/regal/rules/imports/implicit-future-keywords)
 Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
 :::
 
