@@ -325,7 +325,7 @@ When encountering undefined references inside of rules, evaluation of the rule h
 undefined, unless of course, a `default` value has been provided. While saying `allow is undefined` or `allow is false`
 if encountering undefined in a rule is likely desirable, this doesn't hold true when working with "inverted" rules -
 i.e. rules like `deny` (as opposed to `allow`). Saying `deny is undefined` or `deny is false` if undefined is
-encountered, essentially means that any occurence of undefined (such as when attributes are missing in the input
+encountered, essentially means that any occurrence of undefined (such as when attributes are missing in the input
 document) would lead to the `deny` rule not getting enforced. This is particularly common writing partial rules (i.e.
 rules that build [sets](https://www.openpolicyagent.org/docs/latest/policy-language/#generating-sets) or
 [objects](https://www.openpolicyagent.org/docs/latest/policy-language/#generating-objects)).
