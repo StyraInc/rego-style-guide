@@ -117,7 +117,7 @@ pipeline.
 
 ### Use metadata annotations
 
-Favor [metadata annotations](https://www.openpolicyagent.org/docs/latest/annotations/) over regular comments.
+Favor [metadata annotations](https://www.openpolicyagent.org/docs/latest/policy-language/#metadata) over regular comments.
 
 Metadata annotations allow external tools and editors to parse their contents, potentially leveraging them for
 something useful, like in-line explanations, generated docs, etc.
