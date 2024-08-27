@@ -945,7 +945,7 @@ When choosing to follow this recommendation, there are two options:
   - Cons: Large packages can become unwieldy in long files.
 - **Matching the directory only**
   - Pros: Large packages can be broken into many files.
-  - Cons: Exception needed to co-locate test files (i.e. `pacakge foo_test`
+  - Cons: Exception needed to co-locate test files (i.e. `package foo_test`
     should still be in `foo/`).
 
 Either is acceptable, just remember to use the same convention throughout
