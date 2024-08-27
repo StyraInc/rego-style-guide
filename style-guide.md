@@ -69,11 +69,12 @@ Rego is a declarative language, which in the best case means you express **what*
 should be retrieved. When authoring policy, do not try to be "smart" about assumed performance characteristics or
 optimizations. That's what OPA should worry about!
 
-Optimize for **readability** and **obviousness**. Optimize for performance *only* if you've identified performance
+Optimize for **readability** and **obviousness**. Optimize for performance _only_ if you've identified performance
 issues in your policy, and even if you do — making your policy more compact or "clever" almost never helps at addressing
 the problem at hand.
 
 #### Related Resources
+
 - [Policy Performance](https://www.openpolicyagent.org/docs/latest/policy-performance/)
 
 ### Use `opa fmt`
@@ -126,6 +127,7 @@ Annotations are also a good way to de-duplicate information such as documentatio
 and error codes where explanations are returned as part of the result.
 
 **Avoid**
+
 ```rego
 # Example package with documentation
 package example
@@ -144,6 +146,7 @@ deny contains {
 ```
 
 **Prefer**
+
 ```rego
 # METADATA
 # title: Example
@@ -179,6 +182,7 @@ deny contains {
 Use regular comments inside of rule bodies, or for packages and rules you consider "internal".
 
 #### Related Resources
+
 - [Annotations](https://www.openpolicyagent.org/docs/latest/policy-language/#metadata)
 
 ### Get to know the built-in functions
@@ -200,11 +204,13 @@ developer experience as well as the quality of your policies.
 The built-in functions use `snake_case` for naming — follow that convention for your own rules, functions, and variables.
 
 **Avoid**
+
 ```rego
 userIsAdmin if "admin" in input.user.roles
 ```
 
 **Prefer**
+
 ```rego
 user_is_admin if "admin" in input.user.roles
 ```
@@ -255,11 +261,13 @@ adding references to these rules and functions from other packages.
 Long lines are tedious to read. Keep line length at 120 characters or below.
 
 **Avoid**
+
 ```rego
 frontend_admin_users := [username | some user in input.users; "frontend" in user.domains; "admin" in user.roles; username := user.username]
 ```
 
 **Prefer**
+
 ```rego
 frontend_admin_users := [username |
     some user in input.users
@@ -282,6 +290,7 @@ Helper rules makes policies more readable, and for repeated conditions more perf
 more than a few simple expressions, consider splitting it into multiple rules with good names.
 
 **Avoid**
+
 ```rego
 allow if {
     "developer" in input.user.roles
@@ -333,6 +342,7 @@ rules that build [sets](https://www.openpolicyagent.org/docs/latest/policy-langu
 Consider for example this simple rule:
 
 **Avoid**
+
 ```rego
 authorized := count(deny) == 0
 
@@ -353,6 +363,7 @@ This is nice in that we'll get an even more granular message returned to the cal
 working with a large set of input data. To deal with this, a helper rule using _negation_ may be used.
 
 **Prefer**
+
 ```rego
 authorized := count(deny) == 0
 
@@ -366,6 +377,7 @@ but equal to "anonymous". Since we negate the result of the helper rule in the `
 cases covered.
 
 #### Related Resources
+
 - [OPA AWS CloudFormation Hook Tutorial](https://www.openpolicyagent.org/docs/latest/aws-cloudformation-hooks/)
 
 ### Consider partial helper rules over comprehensions in rule bodies
@@ -376,6 +388,7 @@ Having many smaller, composable rules, is often key to quickly identifying where
 queried individually.
 
 **Avoid**
+
 ```rego
 allow if {
     input.request.method in {"GET", "HEAD"}
@@ -394,6 +407,7 @@ allow if {
 ```
 
 **Prefer**
+
 ```rego
 allow if {
     input.request.method in {"GET", "HEAD"}
@@ -426,6 +440,7 @@ Since Rego evaluation is generally free of side effects, any rule or function is
 single value (i.e. a complete rule) or a collection (a partial rule).
 
 **Avoid**
+
 ```rego
 get_first_name(user) := split(user.name, " ")[0]
 
@@ -437,6 +452,7 @@ list_developers contains user if {
 ```
 
 **Prefer**
+
 ```rego
 # "get" is implied
 first_name(user) := split(user.name, " ")[0]
@@ -464,6 +480,7 @@ Rules that return values unconditionally should place the assignment directly in
 in the rule body adds unnecessary noise.
 
 **Avoid**
+
 ```rego
 full_name := name {
     name := concat(", ", [input.first_name, input.last_name])
@@ -473,7 +490,9 @@ divide_by_ten(x) := y {
     y := x / 10
 }
 ```
+
 **Prefer**
+
 ```rego
 full_name := concat(", ", [input.first_name, input.last_name])
 
@@ -493,6 +512,7 @@ Using `in` for membership checks clearly communicates intent, and is less prone 
 checking if something is _not_ part of a collection.
 
 **Avoid**
+
 ```rego
 # "Old" way of checking for membership - iteration + comparison
 allow {
@@ -501,11 +521,13 @@ allow {
 ```
 
 **Prefer**
+
 ```rego
 allow if "admin" in input.user.roles
 ```
 
 **Avoid**
+
 ```rego
 deny contains "Only admin allowed" if not user_is_admin
 
@@ -515,6 +537,7 @@ user_is_admin if {
 ```
 
 **Prefer**
+
 ```rego
 deny contains "Only admin allowed" if not "admin" in input.user.roles
 ```
@@ -530,6 +553,7 @@ Using the `some` .. `in` construct for iteration removes ambiguity around iterat
 generally more pleasant to read.
 
 **Avoid**
+
 ```rego
 my_rule if {
     # Are we iterating users over a partial "other_rule" here,
@@ -542,6 +566,7 @@ While this could be alleviated by declaring `some user` before the iteration, we
 granted when reading code from someone else.
 
 **Avoid**
+
 ```rego
 # Iterating over array
 internal_hosts contains hostname if {
@@ -559,6 +584,7 @@ public_endpoints contains endpoint if {
 ```
 
 **Prefer**
+
 ```rego
 internal_hosts contains hostname if {
     some host in data.network.hosts
@@ -604,6 +630,7 @@ helper rules, or comparing counts of items in the original collection against a 
 comprehension.
 
 **Avoid**
+
 ```rego
 # Negate result of _any_ match
 allow if not any_old_registry
@@ -615,6 +642,7 @@ any_old_registry if {
 ```
 
 **Prefer**
+
 ```rego
 allow if {
     every container in input.request.object.spec.containers {
@@ -624,6 +652,7 @@ allow if {
 ```
 
 **Avoid**
+
 ```rego
 words := ["always", "arbitrary", "air", "brand", "asphalt"]
 
@@ -637,6 +666,7 @@ all_starts_with_a if {
 ```
 
 **Prefer**
+
 ```rego
 words := ["always", "arbitrary", "air", "brand", "asphalt"]
 
@@ -661,6 +691,7 @@ preferable. Separating assignment from comparison clearly demonstrates intent, a
 associated with unification.
 
 **Avoid**
+
 ```rego
 # Top level assignment using unification operator
 roles = input.user.roles
@@ -686,6 +717,7 @@ allow if {
 ```
 
 **Prefer**
+
 ```rego
 # Top level assignment using assignment operator
 roles := input.user.roles
@@ -739,6 +771,7 @@ router {
 ```
 
 #### Related Resources
+
 - [Strict-mode to phase-out the "single =" operator](https://github.com/open-policy-agent/opa/issues/4688)
 - [OPA fmt 2.0](https://github.com/open-policy-agent/opa/issues/4508)
 
@@ -753,6 +786,7 @@ Using undeclared variables (i.e. not declared using `some` or `:=`) makes it har
 in a rule, and introduces ambiguities around scope.
 
 **Avoid**
+
 ```rego
 messages contains message if {
     message := input.topics[topic].body
@@ -760,6 +794,7 @@ messages contains message if {
 ```
 
 **Prefer**
+
 ```rego
 messages contains message if {
     some topic
@@ -786,18 +821,19 @@ Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/reg
 
 ### Prefer sets over arrays (where applicable)
 
-For any *unordered* sequence of *unique* values, prefer to use
+For any _unordered_ sequence of _unique_ values, prefer to use
 [sets](https://www.openpolicyagent.org/docs/latest/policy-reference/#sets) over
 [arrays](https://www.openpolicyagent.org/docs/latest/policy-reference/#arrays).
 
 This is almost always the case for common policy data like **roles** and **permissions**.
 For any applicable sequence of values, sets have the following benefits over arrays:
 
-* Clearly communicate uniqueness and non-ordered characteristics
-* Performance: set lookups are O(1) while array lookups are O(n)
-* Powerful [set operations](https://www.openpolicyagent.org/docs/latest/policy-reference/#sets-2) available
+- Clearly communicate uniqueness and non-ordered characteristics
+- Performance: set lookups are O(1) while array lookups are O(n)
+- Powerful [set operations](https://www.openpolicyagent.org/docs/latest/policy-reference/#sets-2) available
 
 **Avoid**
+
 ```rego
 required_roles := ["accountant", "reports-writer"]
 provided_roles := [role | some role in input.user.roles]
@@ -810,6 +846,7 @@ allow if {
 ```
 
 **Prefer**
+
 ```rego
 required_roles := {"accountant", "reports-writer"}
 provided_roles := {role | some role in input.user.roles}
@@ -822,6 +859,7 @@ allow if {
 ```
 
 **Prefer**
+
 ```rego
 # Alternatively, use set intersection
 allow if {
@@ -830,6 +868,7 @@ allow if {
 ```
 
 #### Related Resources
+
 - [Five things you didn't know about OPA](https://blog.styra.com/blog/five-things-you-didnt-know-about-opa).
 
 ## Functions
@@ -842,6 +881,7 @@ checking the function signature, and it makes it harder to reuse that function i
 functions that only depend on their arguments are easier to test standalone.
 
 **Avoid**
+
 ```rego
 # Depends on both `input` and `data`
 is_preferred_login_method(method) if {
@@ -854,6 +894,7 @@ is_preferred_login_method(method) if {
 ```
 
 **Prefer**
+
 ```rego
 # Depends only on function arguments
 is_preferred_login_method(method, user, all_login_methods) if {
@@ -874,6 +915,7 @@ either using assignment (i.e. `:=`) or by appending a variable name to the argum
 expressions are thus equivalent:
 
 **Avoid**
+
 ```rego
 first_a := i if {
     indexof("answer", "a", i)
@@ -881,6 +923,7 @@ first_a := i if {
 ```
 
 **Prefer**
+
 ```rego
 first_a := i if {
     i := indexof("answer", "a")
@@ -903,6 +946,7 @@ Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/reg
 you to avoid having to escape special characters like `\` in your regex patterns.
 
 **Avoid**
+
 ```rego
 all_digits if {
     regex.match("[\\d]+", "12345")
@@ -910,6 +954,7 @@ all_digits if {
 ```
 
 **Prefer**
+
 ```rego
 all_digits if {
     regex.match(`[\d]+`, "12345")
@@ -929,6 +974,7 @@ Importing packages rather than specific rules and functions allows you to refere
 obvious where the rule or function was declared. Additionally, well-named packages help provide context to assertions.
 
 **Avoid**
+
 ```rego
 import data.user.is_admin
 
@@ -936,6 +982,7 @@ allow if is_admin
 ```
 
 **Prefer**
+
 ```rego
 import data.user
 
@@ -954,6 +1001,7 @@ of the attribute(s) less apparent. Clearly differentiating `input` and `data` fr
 defined inside of the same package helps in making things _obvious_, and few things beat obviousness!
 
 **Avoid**
+
 ```rego
 import input.request.context.user
 
@@ -966,6 +1014,7 @@ fin_dept if {
 ```
 
 **Prefer**
+
 ```rego
 fin_dept if {
     contains(input.request.context.user.department, "finance")
@@ -973,6 +1022,7 @@ fin_dept if {
 ```
 
 **Prefer**
+
 ```rego
 fin_dept if {
     # Alternatively, assign an intermediate variable close to where it's referenced
@@ -1017,6 +1067,7 @@ import all of the future keywords, this construct risks breaking your policies w
 their names happen to collide with names you've used for variables or rules.
 
 **Avoid**
+
 ```rego
 import future.keywords
 
@@ -1027,6 +1078,7 @@ severe_violations contains violation if {
 ```
 
 **Prefer**
+
 ```rego
 import future.keywords.contains
 import future.keywords.if
