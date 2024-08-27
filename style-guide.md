@@ -10,7 +10,7 @@ With new features, language constructs, and other improvements continuously find
 this style guide a reflection of what we consider current best practices. Make sure to check back every once in a while,
 and see the changelog for updates since your last visit.
 
-### Regal
+## Regal
 
 Inspired by this style guide, [Regal](https://github.com/StyraInc/regal) is a new linter for Rego that allows you
 to enforce many of the recommendations in this guide, as well as identifying issues, bugs and potential problems in your
@@ -18,6 +18,8 @@ Rego policies. If you enjoy this style guide, make sure to check it out!
 
 ## Contents
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
 <!-- run make toc to update -->
 
 <!-- toc -->
@@ -51,8 +53,7 @@ Rego policies. If you enjoy this style guide, make sure to check it out!
   * [Avoid using the last argument for the return value](#avoid-using-the-last-argument-for-the-return-value)
 * [Regex](#regex)
   * [Use raw strings for regex patterns](#use-raw-strings-for-regex-patterns)
-* [Packages](#packages)
-  * [Package name should make file location](#package-name-should-make-file-location)
+  * [Package name should match file location](#package-name-should-match-file-location)
 * [Imports](#imports)
   * [Prefer importing packages over rules and functions](#prefer-importing-packages-over-rules-and-functions)
   * [Avoid importing `input`](#avoid-importing-input)
@@ -62,6 +63,9 @@ Rego policies. If you enjoy this style guide, make sure to check it out!
 * [Community](#community)
 
 <!-- tocstop -->
+
+<!-- markdownlint-enable -->
+<!-- markdownlint-restore -->
 
 ## General Advice
 
@@ -968,13 +972,26 @@ You can lint for this recommendation using the [`non-raw-regex-pattern`](https:/
 Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
 :::
 
-## Packages
+### Package name should match file location
 
-### Package name should make file location
-
-When naming packages, the package name should reflect the file's location. This
+When naming packages, the package name should reflect the file location. This
 makes the package implementation easier to find when looking up from elsewhere
 in a project as well.
+
+When choosing to follow this recommendation, there are two options:
+
+- **Matching the directory and filename**
+  - Pros: Reduced nesting for simple policies.
+  - Cons: Large packages can become unwieldy in long files.
+- **Matching the directory only**
+  - Pros: Large packages can be broken into many files.
+  - Cons: Exception needed to co-locate test files (i.e. `pacakge foo_test`
+    should still be in `foo/`).
+
+Either is acceptable, just remember to use the same convention throughout
+your project.
+
+#### Matching the directory and filename
 
 **Avoid**
 
@@ -990,6 +1007,26 @@ package bar.foo
 ```rego
 # foo/bar.rego
 package foo.bar
+
+# ...
+```
+
+#### Matching the directory only
+
+**Avoid**
+
+```rego
+# foo/bar.rego
+package baz
+
+# ...
+```
+
+**Prefer**
+
+```rego
+# foo/bar.rego
+package foo
 
 # ...
 ```
@@ -1138,4 +1175,6 @@ If you'd like to add or remove items for your own company, team or project, fork
 
 ## Community
 
-For questions, discussions and announcements related to Styra products, services and open source projects, please join the Styra community on [Slack](https://communityinviter.com/apps/styracommunity/signup)!
+For questions, discussions and announcements related to
+Styra products, services and open source projects, please join
+the Styra community on [Slack](https://communityinviter.com/apps/styracommunity/signup)!
