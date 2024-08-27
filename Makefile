@@ -1,8 +1,10 @@
 PHONY: deps
 deps:
-	hash markdown-toc || echo "please install markdown-toc: npm install -g markdown-toc"
+	npm install
 
 PHONY: toc
 toc: deps
-	markdown-toc -i style-guide.md --bullets="*" --maxdepth=3
+	npx markdown-toc -i style-guide.md --bullets="*" --maxdepth=3
 
+markdownlint: deps
+	npx markdownlint-cli2 style-guide.md --config=.markdownlint.yaml

@@ -10,7 +10,7 @@ With new features, language constructs, and other improvements continuously find
 this style guide a reflection of what we consider current best practices. Make sure to check back every once in a while,
 and see the changelog for updates since your last visit.
 
-### Regal
+## Regal
 
 Inspired by this style guide, [Regal](https://github.com/StyraInc/regal) is a new linter for Rego that allows you
 to enforce many of the recommendations in this guide, as well as identifying issues, bugs and potential problems in your
@@ -18,6 +18,8 @@ Rego policies. If you enjoy this style guide, make sure to check it out!
 
 ## Contents
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
 <!-- run make toc to update -->
 
 <!-- toc -->
@@ -51,6 +53,7 @@ Rego policies. If you enjoy this style guide, make sure to check it out!
   * [Avoid using the last argument for the return value](#avoid-using-the-last-argument-for-the-return-value)
 * [Regex](#regex)
   * [Use raw strings for regex patterns](#use-raw-strings-for-regex-patterns)
+  * [Package name should match file location](#package-name-should-match-file-location)
 * [Imports](#imports)
   * [Prefer importing packages over rules and functions](#prefer-importing-packages-over-rules-and-functions)
   * [Avoid importing `input`](#avoid-importing-input)
@@ -61,6 +64,9 @@ Rego policies. If you enjoy this style guide, make sure to check it out!
 
 <!-- tocstop -->
 
+<!-- markdownlint-enable -->
+<!-- markdownlint-restore -->
+
 ## General Advice
 
 ### Optimize for readability, not performance
@@ -69,11 +75,12 @@ Rego is a declarative language, which in the best case means you express **what*
 should be retrieved. When authoring policy, do not try to be "smart" about assumed performance characteristics or
 optimizations. That's what OPA should worry about!
 
-Optimize for **readability** and **obviousness**. Optimize for performance *only* if you've identified performance
+Optimize for **readability** and **obviousness**. Optimize for performance _only_ if you've identified performance
 issues in your policy, and even if you do — making your policy more compact or "clever" almost never helps at addressing
 the problem at hand.
 
 #### Related Resources
+
 - [Policy Performance](https://www.openpolicyagent.org/docs/latest/policy-performance/)
 
 ### Use `opa fmt`
@@ -179,6 +186,7 @@ deny contains {
 Use regular comments inside of rule bodies, or for packages and rules you consider "internal".
 
 #### Related Resources
+
 - [Annotations](https://www.openpolicyagent.org/docs/latest/policy-language/#metadata)
 
 ### Get to know the built-in functions
@@ -297,7 +305,6 @@ allow if {
 ```
 
 **Prefer**
-
 ```rego
 allow if {
     is_developer
@@ -366,6 +373,7 @@ but equal to "anonymous". Since we negate the result of the helper rule in the `
 cases covered.
 
 #### Related Resources
+
 - [OPA AWS CloudFormation Hook Tutorial](https://www.openpolicyagent.org/docs/latest/aws-cloudformation-hooks/)
 
 ### Consider partial helper rules over comprehensions in rule bodies
@@ -473,6 +481,7 @@ divide_by_ten(x) := y {
     y := x / 10
 }
 ```
+
 **Prefer**
 ```rego
 full_name := concat(", ", [input.first_name, input.last_name])
@@ -739,6 +748,7 @@ router {
 ```
 
 #### Related Resources
+
 - [Strict-mode to phase-out the "single =" operator](https://github.com/open-policy-agent/opa/issues/4688)
 - [OPA fmt 2.0](https://github.com/open-policy-agent/opa/issues/4508)
 
@@ -786,16 +796,16 @@ Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/reg
 
 ### Prefer sets over arrays (where applicable)
 
-For any *unordered* sequence of *unique* values, prefer to use
+For any _unordered_ sequence of _unique_ values, prefer to use
 [sets](https://www.openpolicyagent.org/docs/latest/policy-reference/#sets) over
 [arrays](https://www.openpolicyagent.org/docs/latest/policy-reference/#arrays).
 
 This is almost always the case for common policy data like **roles** and **permissions**.
 For any applicable sequence of values, sets have the following benefits over arrays:
 
-* Clearly communicate uniqueness and non-ordered characteristics
-* Performance: set lookups are O(1) while array lookups are O(n)
-* Powerful [set operations](https://www.openpolicyagent.org/docs/latest/policy-reference/#sets-2) available
+- Clearly communicate uniqueness and non-ordered characteristics
+- Performance: set lookups are O(1) while array lookups are O(n)
+- Powerful [set operations](https://www.openpolicyagent.org/docs/latest/policy-reference/#sets-2) available
 
 **Avoid**
 ```rego
@@ -830,6 +840,7 @@ allow if {
 ```
 
 #### Related Resources
+
 - [Five things you didn't know about OPA](https://blog.styra.com/blog/five-things-you-didnt-know-about-opa).
 
 ## Functions
@@ -920,6 +931,61 @@ all_digits if {
 You can lint for this recommendation using the [`non-raw-regex-pattern`](https://docs.styra.com/regal/rules/idiomatic/non-raw-regex-pattern)
 Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
 :::
+
+### Package name should match file location
+
+When naming packages, the package name should reflect the file location. This
+makes the package implementation easier to find when looking up from elsewhere
+in a project as well.
+
+When choosing to follow this recommendation, there are two options:
+
+- **Matching the directory and filename**
+  - Pros: Reduced nesting for simple policies.
+  - Cons: Large packages can become unwieldy in long files.
+- **Matching the directory only**
+  - Pros: Large packages can be broken into many files.
+  - Cons: Exception needed to co-locate test files (i.e. `package foo_test`
+    should still be in `foo/`).
+
+Either is acceptable, just remember to use the same convention throughout
+your project.
+
+#### Matching the directory and filename
+
+**Avoid**
+```rego
+# foo/bar.rego
+package bar.foo
+
+# ...
+```
+
+**Prefer**
+```rego
+# foo/bar.rego
+package foo.bar
+
+# ...
+```
+
+#### Matching the directory only
+
+**Avoid**
+```rego
+# foo/bar.rego
+package baz
+
+# ...
+```
+
+**Prefer**
+```rego
+# foo/bar.rego
+package foo
+
+# ...
+```
 
 ## Imports
 
@@ -1058,4 +1124,6 @@ If you'd like to add or remove items for your own company, team or project, fork
 
 ## Community
 
-For questions, discussions and announcements related to Styra products, services and open source projects, please join the Styra community on [Slack](https://communityinviter.com/apps/styracommunity/signup)!
+For questions, discussions and announcements related to
+Styra products, services and open source projects, please join
+the Styra community on [Slack](https://communityinviter.com/apps/styracommunity/signup)!
