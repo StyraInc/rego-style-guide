@@ -20,3 +20,12 @@ jobs:
           echo "Please update the table of contents with make toc"
           exit 1
         fi
+    - run: make markdownlint
+    - run: git diff
+    - run: |
+        if [ -z "$(git status --porcelain)" ]; then
+          echo "No changes"
+        else
+          echo "Please fix the markdownlint errors"
+          exit 1
+        fi
