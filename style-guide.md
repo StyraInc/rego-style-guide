@@ -55,6 +55,7 @@ Rego policies. If you enjoy this style guide, make sure to check it out!
   * [Avoid using the last argument for the return value](#avoid-using-the-last-argument-for-the-return-value)
 * [Regex](#regex)
   * [Use raw strings for regex patterns](#use-raw-strings-for-regex-patterns)
+* [Packages](#packages)
   * [Package name should match file location](#package-name-should-match-file-location)
 * [Imports](#imports)
   * [Prefer importing packages over rules and functions](#prefer-importing-packages-over-rules-and-functions)
@@ -933,6 +934,8 @@ all_digits if {
 You can lint for this recommendation using the [`non-raw-regex-pattern`](https://docs.styra.com/regal/rules/idiomatic/non-raw-regex-pattern)
 Regal rule. Get started with [Regal, the Rego linter](https://docs.styra.com/regal).
 :::
+
+## Packages
 
 ### Package name should match file location
 
