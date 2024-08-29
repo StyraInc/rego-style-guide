@@ -1,5 +1,7 @@
 # Rego Style Guide
 
+<!-- The source of truth for this file is at https://github.com/StyraInc/rego-style-guide/blob/main/style-guide.md -->
+
 The purpose of this style guide is to provide a collection of recommendations and best practices for authoring
 [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/).
 From [Styra](https://www.styra.com), the founders of [Open Policy Agent](https://www.openpolicyagent.org) (OPA),
