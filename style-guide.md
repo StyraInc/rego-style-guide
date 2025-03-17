@@ -1131,4 +1131,4 @@ If you'd like to add or remove items for your own company, team or project, fork
 
 For questions, discussions and announcements related to
 Styra products, services and open source projects, please join
-the Styra community on [Slack](https://communityinviter.com/apps/styracommunity/signup)!
+the Styra community on [Slack](https://inviter.co/styra)!

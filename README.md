@@ -22,4 +22,4 @@ containing the guide's content can be found in `style-guide.md`.
 
 For questions, discussions and announcements related to Styra products,
 services and open source projects, please join the
-[Styra community on Slack](https://communityinviter.com/apps/styracommunity/signup)!
+[Styra community on Slack](https://inviter.co/styra)!
